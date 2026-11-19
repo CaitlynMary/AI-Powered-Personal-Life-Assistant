@@ -1,0 +1,79 @@
+<header
+  class="sticky top-0 z-30 flex items-center gap-3 border-b border-ls-border bg-ls-bg/85 px-4 py-3 backdrop-blur-md sm:px-6 lg:px-8"
+>
+  <button
+    type="button"
+    class="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-plum text-cream transition hover:bg-plum/90 lg:hidden"
+    aria-label="Open navigation menu"
+    (click)="openMobileNav()"
+  >
+    <svg lucideIcon="menu" [size]="20"></svg>
+  </button>
+
+  <label class="relative min-w-0 flex-1">
+    <span class="sr-only">Search</span>
+    <span
+      class="pointer-events-none absolute inset-y-0 left-4 flex items-center text-ls-text-muted"
+    >
+      <svg lucideIcon="search" [size]="18"></svg>
+    </span>
+    <input
+      type="search"
+      name="search"
+      [(ngModel)]="searchQuery"
+      placeholder="Search tasks, goals, notes..."
+      class="h-12 w-full rounded-full border border-ls-border bg-[var(--ls-header-search)] pl-11 pr-4 text-sm font-medium text-ls-text shadow-soft placeholder:text-ls-text-muted/80 transition focus:border-navy/40"
+    />
+  </label>
+
+  <div class="flex items-center gap-2 sm:gap-3">
+    <button
+      type="button"
+      class="inline-flex h-11 items-center gap-2 rounded-full border border-ls-border bg-[var(--ls-header-search)] px-3 text-ls-text shadow-soft transition hover:border-navy/30"
+      (click)="toggleTheme()"
+      [attr.aria-label]="mode() === 'light' ? 'Switch to dark theme' : 'Switch to light theme'"
+    >
+      @if (mode() === 'light') {
+        <svg lucideIcon="sun" [size]="18" class="text-purple"></svg>
+        <span class="hidden text-xs font-semibold sm:inline">Light</span>
+      } @else {
+        <svg lucideIcon="moon" [size]="18" class="text-orchid"></svg>
+        <span class="hidden text-xs font-semibold sm:inline">Dark</span>
+      }
+    </button>
+
+    <app-notification-menu />
+
+    <button
+      type="button"
+      class="inline-flex items-center gap-2 rounded-full border border-ls-border bg-[var(--ls-header-search)] py-1.5 pl-1.5 pr-3 shadow-soft transition hover:border-mint/50"
+      [attr.aria-label]="
+        profile() ? 'Profile for ' + profile()!.fullName + ', ' + profile()!.email : 'User profile'
+      "
+      [attr.title]="profile()?.email ?? profileError() ?? 'User profile'"
+    >
+      <span
+        class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-powder-blue to-mint text-sm font-bold text-plum dark:from-navy dark:to-deep-purple dark:text-cream"
+      >
+        {{ avatarInitials() }}
+      </span>
+      <span class="hidden max-w-36 min-w-0 flex-col items-start sm:flex">
+        @if (profile(); as user) {
+          <span class="max-w-full truncate text-sm font-semibold text-ls-text">{{
+            user.fullName
+          }}</span>
+          <span class="max-w-full truncate text-xs font-medium text-ls-text-muted">{{
+            user.email
+          }}</span>
+        } @else if (profileLoading()) {
+          <span class="text-sm font-semibold text-ls-text" role="status">Loading profile…</span>
+        } @else if (profileError()) {
+          <span class="text-sm font-semibold text-ls-text" role="status">Profile unavailable</span>
+        } @else {
+          <span class="text-sm font-semibold text-ls-text">Account</span>
+        }
+      </span>
+      <svg lucideIcon="chevron-down" [size]="16" class="hidden text-ls-text-muted sm:block"></svg>
+    </button>
+  </div>
+</header>

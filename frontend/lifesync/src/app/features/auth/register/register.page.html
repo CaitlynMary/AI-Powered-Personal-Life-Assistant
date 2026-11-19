@@ -1,0 +1,129 @@
+<app-auth-shell>
+  <p class="text-sm font-bold uppercase tracking-[0.14em] text-orchid">Get started</p>
+  <h2 class="mt-1 text-3xl font-extrabold text-plum dark:text-cream">Create your account</h2>
+  <p class="mt-2 text-sm font-medium text-ls-text/70">
+    Your details are saved by the LifeSync server. Password confirmation stays in the browser.
+  </p>
+
+  @if (errorMessage(); as message) {
+    <p class="mt-4 rounded-2xl bg-burgundy/10 px-4 py-3 text-sm font-semibold text-burgundy dark:text-cream" role="alert">
+      {{ message }}
+    </p>
+  }
+
+  <form class="mt-6 space-y-4" [formGroup]="form" (ngSubmit)="submit()">
+    <label class="block">
+      <span class="mb-1.5 block text-sm font-bold text-ls-text">Full name</span>
+      <span class="relative block">
+        <svg lucideIcon="user" [size]="18" class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-orchid"></svg>
+        <input
+          type="text"
+          formControlName="fullName"
+          autocomplete="name"
+          class="h-12 w-full rounded-2xl border border-plum/15 bg-ls-input pl-10 pr-3 text-sm font-medium text-ls-text outline-none focus:border-navy"
+          placeholder="Cathy"
+        />
+      </span>
+      @if (form.controls.fullName.touched && form.controls.fullName.invalid) {
+        <span class="mt-1 block text-xs font-semibold text-burgundy">Full name is required (max 100 characters).</span>
+      }
+    </label>
+
+    <label class="block">
+      <span class="mb-1.5 block text-sm font-bold text-ls-text">Email</span>
+      <span class="relative block">
+        <svg lucideIcon="mail" [size]="18" class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-orchid"></svg>
+        <input
+          type="email"
+          formControlName="email"
+          autocomplete="email"
+          class="h-12 w-full rounded-2xl border border-plum/15 bg-ls-input pl-10 pr-3 text-sm font-medium text-ls-text outline-none focus:border-navy"
+          placeholder="you@example.com"
+        />
+      </span>
+      @if (form.controls.email.touched && form.controls.email.invalid) {
+        <span class="mt-1 block text-xs font-semibold text-burgundy">Enter a valid email address.</span>
+      }
+    </label>
+
+    <label class="block">
+      <span class="mb-1.5 block text-sm font-bold text-ls-text">Phone number <span class="font-medium text-orchid">(optional)</span></span>
+      <span class="relative block">
+        <svg lucideIcon="phone" [size]="18" class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-orchid"></svg>
+        <input
+          type="tel"
+          formControlName="phoneNumber"
+          autocomplete="tel"
+          class="h-12 w-full rounded-2xl border border-plum/15 bg-ls-input pl-10 pr-3 text-sm font-medium text-ls-text outline-none focus:border-navy"
+          placeholder="+919876543210"
+        />
+      </span>
+      @if (form.controls.phoneNumber.touched && form.controls.phoneNumber.invalid) {
+        <span class="mt-1 block text-xs font-semibold text-burgundy">
+          Use 7 to 15 digits, optionally starting with +.
+        </span>
+      }
+    </label>
+
+    <label class="block">
+      <span class="mb-1.5 block text-sm font-bold text-ls-text">Password</span>
+      <span class="relative block">
+        <svg lucideIcon="lock" [size]="18" class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-orchid"></svg>
+        <input
+          [type]="showPassword() ? 'text' : 'password'"
+          formControlName="password"
+          autocomplete="new-password"
+          class="h-12 w-full rounded-2xl border border-plum/15 bg-ls-input pl-10 pr-12 text-sm font-medium text-ls-text outline-none focus:border-navy"
+        />
+        <button
+          type="button"
+          class="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-xl text-ls-text"
+          (click)="showPassword.set(!showPassword())"
+          [attr.aria-label]="showPassword() ? 'Hide password' : 'Show password'"
+        >
+          <svg [lucideIcon]="showPassword() ? 'eye-off' : 'eye'" [size]="18"></svg>
+        </button>
+      </span>
+      @if (form.controls.password.touched && form.controls.password.invalid) {
+        <span class="mt-1 block text-xs font-semibold text-burgundy">Password must be 8 to 100 characters.</span>
+      }
+    </label>
+
+    <label class="block">
+      <span class="mb-1.5 block text-sm font-bold text-ls-text">Confirm password</span>
+      <span class="relative block">
+        <svg lucideIcon="lock" [size]="18" class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-orchid"></svg>
+        <input
+          [type]="showConfirm() ? 'text' : 'password'"
+          formControlName="confirmPassword"
+          autocomplete="new-password"
+          class="h-12 w-full rounded-2xl border border-plum/15 bg-ls-input pl-10 pr-12 text-sm font-medium text-ls-text outline-none focus:border-navy"
+        />
+        <button
+          type="button"
+          class="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-xl text-ls-text"
+          (click)="showConfirm.set(!showConfirm())"
+          [attr.aria-label]="showConfirm() ? 'Hide confirm password' : 'Show confirm password'"
+        >
+          <svg [lucideIcon]="showConfirm() ? 'eye-off' : 'eye'" [size]="18"></svg>
+        </button>
+      </span>
+      @if (form.controls.confirmPassword.touched && form.hasError('passwordMismatch')) {
+        <span class="mt-1 block text-xs font-semibold text-burgundy">Passwords do not match.</span>
+      }
+    </label>
+
+    <button
+      type="submit"
+      class="flex h-12 w-full items-center justify-center rounded-2xl bg-lime text-sm font-extrabold text-plum transition hover:bg-mint disabled:cursor-wait disabled:opacity-70"
+      [disabled]="loading()"
+    >
+      {{ loading() ? 'Creating account...' : 'Create account' }}
+    </button>
+  </form>
+
+  <p class="mt-6 text-center text-sm font-medium text-ls-text/75">
+    Already have an account?
+    <a routerLink="/login" class="font-extrabold text-plum underline-offset-2 hover:underline dark:text-cream">Sign in</a>
+  </p>
+</app-auth-shell>

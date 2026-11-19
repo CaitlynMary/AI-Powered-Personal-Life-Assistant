@@ -1,0 +1,133 @@
+{
+  "planHash": "2dd16fb652775bbbd583162b4f3aa3ce692b82f374de7ab19f0e42910bb6ab28",
+  "phase": "standalone",
+  "recordedAtUtc": "2026-11-18T10:00:56.7524313Z",
+  "retryCount": 0,
+  "resetBaseline": false,
+  "complete": true,
+  "result": {
+    "setupSucceeded": true,
+    "setupDurationMs": 0,
+    "setupFailureOutput": null,
+    "assertions": [
+      {
+        "name": "tests-pass",
+        "kind": "process",
+        "verificationMethod": "test-results",
+        "passed": true,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": 0,
+        "outputSample": "\r\n\u003E lifesync@0.0.0 test\r\n\u003E ng test --watch=false\r\n\r\n\u001B[33m\u003E\u001B[39m Building...\r\n\u001B[32m\u221A\u001B[39m Building...\r\n\u001B[1mInitial chunk files\u001B[22m                                                   \u001B[2m | \u001B[22m\u001B[1mNames\u001B[22m                                                              \u001B[2m | \u001B[22m \u001B[1mRaw size\u001B[22m\r\n\u001B[32mstyles.css\u001B[39m                                                            \u001B[2m | \u001B[22m\u001B[2mstyles\u001B[22m                                                             \u001B[2m | \u001B[22m\u001B[36m126.44 kB\u001B[39m\u001B[2m | \u001B[22m\r\n\u001B[32mchunk-VVG3FBRT.js\u001B[39m                                                     \u001B[2m | \u001B[22m\u001B[2m-\u001B[22m                                                                  \u001B[2m | \u001B[22m \u001B[36m96.25 kB\u001B[39m\u001B[2m | \u001B[22m\r\n\u001B[32mchunk-O3N7IOUP.js\u001B[39m                                                     \u001B[2m | \u001B[22m\u001B[2m-\u001B[22m                                                                  \u001B[2m | \u001B[22m \u001B[36m92.88 kB\u001B[39m\u001B[2m | \u001B[22m\r\n\u001B[32mchunk-P3GOIFNJ.js\u001B[39m                                                     \u001B[2m | \u001B[22m\u001B[2m-\u001B[22m                                                                  \u001B[2m | \u001B[22m \u001B[36m92.86 kB\u001B[39m\u001B[2m | \u001B[22m\r\n\u001B[32mchunk-JHLLT7RN.js\u001B[39m                                                     \u001B[2m | \u001B[22m\u001B[2m-\u001B[22m                                                                  \u001B[2m | \u001B[22m \u001B[36m87.41 kB\u001B[39m\u001B[2m | \u001B[22m\r\n\u001B[32mchunk-Q3QDXDIY.js\u001B[39m                                                     \u001B[2m | \u001B[22m\u001B[2m-\u001B[22m                                                                  \u001B[2m | \u001B[22m \u001B[36m66.95 kB\u001B[39m\u001B[2m | \u001B[22m\r\n\u001B[32mchunk-3UUF7SCN.js\u001B[39m                                                     \u001B[2m | \u001B[22m\u001B[2m-\u001B[22m                                                                  \u001B[2m | \u001B[22m \u001B[36m63.94 kB\u001B[39m\u001B[2m | \u001B[22m\r\n\u001B[32mchunk-BGHMZ335.js\u001B[39m                                                     \u001B[2m | \u001B[22m\u001B[2m-\u001B[22m                                                                  \u001B[2m | \u001B[22m \u001B[36m62.03 kB\u001B[39m\u001B[2m | \u001B[22m\r\n\u001B[32mchunk-PM7KAKHJ.js\u001B[39m                                                     \u001B[2m | \u001B[22m\u001B[2m-\u001B[22m                                                                  \u001B[2m | \u001B[22m \u001B[36m53.47 kB\u001B[39m\u001B[2m | \u001B[22m\r\n\u001B[32mchunk-4AFF3DFX.js\u001B[39m                                                     \u001B[2m | \u001B[22m\u001B[2m-\u001B[22m                                                                  \u001B[2m | \u001B[22m \u001B[36m49.87 kB\u001B[39m\u001B[2m | \u001B[22m\r\n\u001B[32mchunk-B56CO27A.js\u001B[39m                                                     \u001B[2m | \u001B[22m\u001B[2m-\u001B[22m                                                                  \u001B[2m | \u001B[22m \u001B[36m48.18 kB\u001B[39m\u001B[2m | \u001B[22m\r\n\u001B[32mchunk-B6GT6T2K.js\u001B[39m                                                     \u001B[2m | \u001B[22m\u001B[2m-\u001B[22m                                                                  \u001B[2m | \u001B[22m \u001B[36m47.41 kB\u001B[39m\u001B[2m | \u001B[22m\r\n\u001B[32mchunk-A4ZIL5BK.js\u001B[39m                                                     \u001B[2m | \u001B[22m\u001B[2m-\u001B[22m                                                                  \u001B[2m | \u001B[22m \u001B[36m44.79 kB\u001B[39m\u001B[2m | \u001B[22m\r\n\u001B[32mspec-app-app.routes.js\u001B[39m                                                \u001B[2m | \u001B[22m\u001B[2mspec-app-app.routes\u001B[22m                                                \u001B[2m | \u001B[22m \u001B[36m40.07 kB\u001B[39m\u001B[2m | \u001B[22m\r\n\u001B[32mchunk-3EGUVIZJ.js\u001B[39m                                                     \u001B[2m | \u001B[22m\u001B[2m-\u001B[22m                                                                  \u001B[2m | \u001B[22m \u001B[36m37.81 kB\u001B[39m\u001B[2m | \u001B[22m\r\n\u001B[32mchunk-LXQ2H563.js\u001B[39m                                                     \u001B[2m | \u001B[22m\u001B[2m-\u001B[22m                                                                  \u001B[2m | \u001B[22m \u001B[36m35.50 kB\u001B[39m\u001B[2m | \u001B[22m\r\n\u001B[32mchunk-JD5ZTTJ4.js\u001B[39m                                                     \u001B[2m | \u001B[22m\u001B[2m-\u001B[22m                                                                  \u001B[2m | \u001B[22m \u001B[36m35.00 kB\u001B[39m\u001B[2m | \u001B[22m\r\n\u001B[32mchunk-EPFNPEXX.js\u001B[39m                                                     \u001B[2m | \u001B[22m\u001B[2m-\u001B[22m                                                                  \u001B[2m |\n\u2026[truncated]",
+        "durationMs": 51033,
+        "testResults": {
+          "testFramework": "vitest",
+          "runnerDetectedFrom": "package_json",
+          "testsTotal": 175,
+          "testsPassed": 175,
+          "testsFailed": 0,
+          "testsSkipped": 0,
+          "parseFailed": false
+        }
+      },
+      {
+        "name": "production-build",
+        "kind": "process",
+        "verificationMethod": "exit-code",
+        "passed": true,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": 0,
+        "outputSample": "\r\n\u003E lifesync@0.0.0 build\r\n\u003E ng build\r\n\r\n\u001B[33m\u003E\u001B[39m Building...\r\n\u001B[32m\u221A\u001B[39m Building...\r\n\u001B[1mInitial chunk files\u001B[22m\u001B[2m | \u001B[22m\u001B[1mNames\u001B[22m             \u001B[2m | \u001B[22m \u001B[1mRaw size\u001B[22m\u001B[2m | \u001B[22m\u001B[1mEstimated transfer size\u001B[22m\r\n\u001B[32mchunk-L23PH7KK.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2m-\u001B[22m                 \u001B[2m | \u001B[22m\u001B[36m194.21 kB\u001B[39m\u001B[2m | \u001B[22m               \u001B[36m56.65 kB\u001B[39m\r\n\u001B[32mchunk-333IWMSR.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2m-\u001B[22m                 \u001B[2m | \u001B[22m\u001B[36m148.41 kB\u001B[39m\u001B[2m | \u001B[22m                \u001B[36m9.14 kB\u001B[39m\r\n\u001B[32mstyles-NJUYU4CL.css\u001B[39m\u001B[2m | \u001B[22m\u001B[2mstyles\u001B[22m            \u001B[2m | \u001B[22m\u001B[36m101.08 kB\u001B[39m\u001B[2m | \u001B[22m               \u001B[36m14.77 kB\u001B[39m\r\n\u001B[32mchunk-4O73ZQBX.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2m-\u001B[22m                 \u001B[2m | \u001B[22m \u001B[36m76.66 kB\u001B[39m\u001B[2m | \u001B[22m               \u001B[36m19.13 kB\u001B[39m\r\n\u001B[32mchunk-XD47IE66.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2m-\u001B[22m                 \u001B[2m | \u001B[22m \u001B[36m48.57 kB\u001B[39m\u001B[2m | \u001B[22m                \u001B[36m9.79 kB\u001B[39m\r\n\u001B[32mmain-6BGKWJOE.js\u001B[39m   \u001B[2m | \u001B[22m\u001B[2mmain\u001B[22m              \u001B[2m | \u001B[22m \u001B[36m29.84 kB\u001B[39m\u001B[2m | \u001B[22m                \u001B[36m8.13 kB\u001B[39m\r\n\u001B[32mchunk-DQXRWL4I.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2m-\u001B[22m                 \u001B[2m | \u001B[22m \u001B[36m12.85 kB\u001B[39m\u001B[2m | \u001B[22m                \u001B[36m4.00 kB\u001B[39m\r\n\u001B[32mchunk-VSMPMZC3.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2m-\u001B[22m                 \u001B[2m | \u001B[22m  \u001B[36m2.65 kB\u001B[39m\u001B[2m | \u001B[22m              \u001B[36m894 bytes\u001B[39m\r\n\u001B[32mchunk-ZGSIFB4P.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2m-\u001B[22m                 \u001B[2m | \u001B[22m  \u001B[36m2.01 kB\u001B[39m\u001B[2m | \u001B[22m              \u001B[36m714 bytes\u001B[39m\r\n\u001B[32mchunk-CJBUVMW7.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2m-\u001B[22m                 \u001B[2m | \u001B[22m  \u001B[36m1.94 kB\u001B[39m\u001B[2m | \u001B[22m              \u001B[36m722 bytes\u001B[39m\r\n\u001B[32mchunk-V2BP4MFT.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2m-\u001B[22m                 \u001B[2m | \u001B[22m  \u001B[36m1.42 kB\u001B[39m\u001B[2m | \u001B[22m              \u001B[36m519 bytes\u001B[39m\r\n\u001B[32mchunk-X3F2LHSG.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2m-\u001B[22m                 \u001B[2m | \u001B[22m\u001B[36m995 bytes\u001B[39m\u001B[2m | \u001B[22m              \u001B[36m995 bytes\u001B[39m\r\n\u001B[32mchunk-ODNDUVUW.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2m-\u001B[22m                 \u001B[2m | \u001B[22m\u001B[36m830 bytes\u001B[39m\u001B[2m | \u001B[22m              \u001B[36m830 bytes\u001B[39m\r\n\u001B[32mchunk-RXPFG4NH.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2m-\u001B[22m                 \u001B[2m | \u001B[22m\u001B[36m577 bytes\u001B[39m\u001B[2m | \u001B[22m              \u001B[36m577 bytes\u001B[39m\r\n\u001B[32mchunk-GKPQQLRP.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2m-\u001B[22m                 \u001B[2m | \u001B[22m\u001B[36m462 bytes\u001B[39m\u001B[2m | \u001B[22m              \u001B[36m462 bytes\u001B[39m\r\n\u001B[32mchunk-R45GXBN7.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2m-\u001B[22m                 \u001B[2m | \u001B[22m\u001B[36m409 bytes\u001B[39m\u001B[2m | \u001B[22m              \u001B[36m409 bytes\u001B[39m\r\n\r\n\u001B[1m \u001B[22m                  \u001B[2m | \u001B[22m\u001B[1mInitial total\u001B[22m     \u001B[2m | \u001B[22m\u001B[1m\u001B[93m622.90 kB\u001B[39m\u001B[22m\u001B[2m | \u001B[22m              \u001B[1m127.75 kB\u001B[22m\r\n\r\n\u001B[1mLazy chunk files\u001B[22m   \u001B[2m | \u001B[22m\u001B[1mNames\u001B[22m             \u001B[2m | \u001B[22m \u001B[1mRaw size\u001B[22m\u001B[2m | \u001B[22m\u001B[1mEstimated transfer size\u001B[22m\r\n\u001B[32mchunk-P6JQGLPE.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2mai-assistant-page\u001B[22m \u001B[2m | \u001B[22m \u001B[36m84.37 kB\u001B[39m\u001B[2m | \u001B[22m               \u001B[36m22.35 kB\u001B[39m\r\n\u001B[32mchunk-IHZA4XGX.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2mcalendar-page\u001B[22m     \u001B[2m | \u001B[22m \u001B[36m42.53 kB\u001B[39m\u001B[2m | \u001B[22m                \u001B[36m9.71 kB\u001B[39m\r\n\u001B[32mchunk-T7HIFCER.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2mhabits-page\u001B[22m       \u001B[2m | \u001B[22m \u001B[36m40.25 kB\u001B[39m\u001B[2m | \u001B[22m                \u001B[36m9.34 kB\u001B[39m\r\n\u001B[32mchunk-3QHQRUNC.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2mtasks-page\u001B[22m        \u001B[2m | \u001B[22m \u001B[36m39.81 kB\u001B[39m\u001B[2m | \u001B[22m                \u001B[36m8.74 kB\u001B[39m\r\n\u001B[32mchunk-B6XP2WO7.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2mdashboard-page\u001B[22m    \u001B[2m | \u001B[22m \u001B[36m38.77 kB\u001B[39m\u001B[2m | \u001B[22m               \u001B[36m10.27 kB\u001B[39m\r\n\u001B[32mchunk-DS63HZI6.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2mgoals-page\u001B[22m        \u001B[2m | \u001B[22m \u001B[36m33.83 kB\u001B[39m\u001B[2m | \u001B[22m                \u001B[36m7.24 kB\u001B[39m\r\n\u001B[32mchunk-7GK6XOQ4.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2msettings-page\u001B[22m     \u001B[2m | \u001B[22m \u001B[36m30.12 kB\u001B[39m\u001B[2m | \u001B[22m                \u001B[36m6.99 kB\u001B[39m\r\n\u001B[32mchunk-HOUGBAHV.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2mreminders-page\u001B[22m    \u001B[2m | \u001B[22m \u001B[36m28.58 kB\u001B[39m\u001B[2m | \u001B[22m                \u001B[36m7.20 kB\u001B[39m\r\n\u001B[32mchunk-2NFNG2PC.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2mplanner-page\u001B[\n\u2026[truncated]",
+        "durationMs": 11760
+      },
+      {
+        "name": "prettier-check",
+        "kind": "process",
+        "verificationMethod": "exit-code",
+        "passed": false,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": 1,
+        "outputSample": "Checking formatting...\r\n[\u001B[33mwarn\u001B[39m] src/app/features/ai-assistant/components/ai-chat-panel.html\r\n[\u001B[33mwarn\u001B[39m] src/styles.css\r\n[\u001B[33mwarn\u001B[39m] Code style issues found in 2 files. Run Prettier with --write to fix.\r\n",
+        "durationMs": 2828
+      },
+      {
+        "name": "angular-app-serves",
+        "kind": "http-probe",
+        "verificationMethod": "http-status",
+        "passed": true,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": null,
+        "outputSample": "HTTP 200\n\u003C!doctype html\u003E\r\n\u003Chtml lang=\u0022en\u0022\u003E\r\n\u003Chead\u003E\n  \u003Cscript type=\u0022module\u0022 src=\u0022/@vite/client\u0022\u003E\u003C/script\u003E\n\r\n  \u003Cmeta charset=\u0022utf-8\u0022\u003E\r\n  \u003Ctitle\u003ELifeSync\u003C/title\u003E\r\n  \u003Cbase href=\u0022/\u0022\u003E\r\n  \u003Cmeta name=\u0022viewport\u0022 content=\u0022width=device-width, initial-scale=1\u0022\u003E\r\n  \u003Cscript\u003E\r\n    if (localStorage.getItem(\u0027lifesync-theme\u0027) === \u0027dark\u0027) {\r\n      document.documentElement.classList.add(\u0027dark\u0027);\r\n    }\r\n  \u003C/script\u003E\r\n  \u003Clink rel=\u0022icon\u0022 type=\u0022image/x-icon\u0022 href=\u0022favicon.ico\u0022\u003E\r\n\u003Clink rel=\u0022stylesheet\u0022 href=\u0022styles.css\u0022\u003E\u003C/head\u003E\r\n\u003Cbody\u003E\r\n  \u003Capp-root\u003E\u003C/app-root\u003E\r\n\u003Cscript src=\u0022main.js\u0022 type=\u0022module\u0022\u003E\u003C/script\u003E\u003C/body\u003E\r\n\u003C/html\u003E\r\n\n--- server output ---\n\r\n\u003E lifesync@0.0.0 start\r\n\u003E ng serve --host 127.0.0.1 --port 4201\r\n\r\n\u001B[33m\u003E\u001B[39m Building...\r\n\u001B[32m\u221A\u001B[39m Building...\r\n\u001B[1mInitial chunk files\u001B[22m\u001B[2m | \u001B[22m\u001B[1mNames\u001B[22m             \u001B[2m | \u001B[22m \u001B[1mRaw size\u001B[22m\r\n\u001B[32mstyles.css\u001B[39m         \u001B[2m | \u001B[22m\u001B[2mstyles\u001B[22m            \u001B[2m | \u001B[22m\u001B[36m126.48 kB\u001B[39m\u001B[2m | \u001B[22m\r\n\u001B[32mmain.js\u001B[39m            \u001B[2m | \u001B[22m\u001B[2mmain\u001B[22m              \u001B[2m | \u001B[22m \u001B[36m88.12 kB\u001B[39m\u001B[2m | \u001B[22m\r\n\u001B[32mchunk-MQ7VYNCB.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2m-\u001B[22m                 \u001B[2m | \u001B[22m  \u001B[36m6.31 kB\u001B[39m\u001B[2m | \u001B[22m\r\n\u001B[32mchunk-7FZ7PZA4.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2m-\u001B[22m                 \u001B[2m | \u001B[22m  \u001B[36m6.14 kB\u001B[39m\u001B[2m | \u001B[22m\r\n\u001B[32mchunk-JWWQ5DUQ.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2m-\u001B[22m                 \u001B[2m | \u001B[22m  \u001B[36m4.63 kB\u001B[39m\u001B[2m | \u001B[22m\r\n\u001B[32mchunk-N3VFXVP4.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2m-\u001B[22m                 \u001B[2m | \u001B[22m  \u001B[36m3.73 kB\u001B[39m\u001B[2m | \u001B[22m\r\n\u001B[32mchunk-M6ZDXLTE.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2m-\u001B[22m                 \u001B[2m | \u001B[22m  \u001B[36m3.60 kB\u001B[39m\u001B[2m | \u001B[22m\r\n\u001B[32mchunk-ZX4QNRGK.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2m-\u001B[22m                 \u001B[2m | \u001B[22m  \u001B[36m3.03 kB\u001B[39m\u001B[2m | \u001B[22m\r\n\u001B[32mchunk-34GI7RR5.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2m-\u001B[22m                 \u001B[2m | \u001B[22m  \u001B[36m1.54 kB\u001B[39m\u001B[2m | \u001B[22m\r\n\u001B[32mchunk-WAFTEI5H.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2m-\u001B[22m                 \u001B[2m | \u001B[22m  \u001B[36m1.37 kB\u001B[39m\u001B[2m | \u001B[22m\r\n\u001B[32mchunk-VUJOFXKG.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2m-\u001B[22m                 \u001B[2m | \u001B[22m\u001B[36m938 bytes\u001B[39m\u001B[2m | \u001B[22m\r\n\u001B[32mchunk-SOWP443K.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2m-\u001B[22m                 \u001B[2m | \u001B[22m\u001B[36m809 bytes\u001B[39m\u001B[2m | \u001B[22m\r\n\r\n\u001B[1m \u001B[22m                  \u001B[2m | \u001B[22m\u001B[1mInitial total\u001B[22m     \u001B[2m | \u001B[22m\u001B[1m246.69 kB\u001B[22m\r\n\r\n\u001B[1mLazy chunk files\u001B[22m   \u001B[2m | \u001B[22m\u001B[1mNames\u001B[22m             \u001B[2m | \u001B[22m \u001B[1mRaw size\u001B[22m\r\n\u001B[32mchunk-YFTXO2Y3.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2mcalendar-page\u001B[22m     \u001B[2m | \u001B[22m\u001B[36m122.55 kB\u001B[39m\u001B[2m | \u001B[22m\r\n\u001B[32mchunk-K3RDOCTX.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2mhabits-page\u001B[22m       \u001B[2m | \u001B[22m\u001B[36m121.80 kB\u001B[39m\u001B[2m | \u001B[22m\r\n\u001B[32mchunk-74HELOHZ.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2mtasks-page\u001B[22m        \u001B[2m | \u001B[22m\u001B[36m119.16 kB\u001B[39m\u001B[2m | \u001B[22m\r\n\u001B[32mchunk-Y57KN6WU.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2mdashboard-page\u001B[22m    \u001B[2m | \u001B[22m\u001B[36m108.95 kB\u001B[39m\u001B[2m | \u001B[22m\r\n\u001B[32mchunk-MYUJGPU7.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2mgoals-page\u001B[22m        \u001B[2m | \u001B[22m\u001B[36m103.35 kB\u001B[39m\u001B[2m | \u001B[22m\r\n\u001B[32mchunk-6TVJUE5B.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2mai-assistant-page\u001B[22m \u001B[2m | \u001B[22m\u001B[36m100.01 kB\u001B[39m\u001B[2m | \u001B[22m\r\n\u001B[32mchunk-VMRS56RG.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2msettings-page\u001B[22m     \u001B[2m | \u001B[22m \u001B[36m89.24 kB\u001B[39m\u001B[2m | \u001B[22m\r\n\u001B[32mchunk-HAI2QBEO.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2mplanner-page\u001B[22m      \u001B[2m | \u001B[22m \u001B[36m85.49 kB\u001B[39m\u001B[2m | \u001B[22m\r\n\u001B[32mchunk-KK5ISG7I.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2mreminders-page\u001B[22m    \u001B[2m | \u001B[22m \u001B[36m84.53 kB\u001B[39m\u001B[2m | \u001B[22m\r\n\u001B[32mchunk-TKJVF56W.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2mnotes-page\u001B[22m        \u001B[2m | \u001B[22m \u001B[36m71.64 kB\u001B[39m\u001B[2m | \u001B[22m\r\n\u001B[32mchunk-BTZWILPY.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2mjournal-page\u001B[22m      \u001B[2m | \u001B[22m \u001B[36m55.21 kB\u001B[39m\u001B[2m | \u001B[22m\r\n\u001B[32mchunk-WZMOBXZT.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2mnotifications-page\u001B[22m\u001B[2m | \u001B[22m \u001B[36m49.71 kB\u001B[39m\u001B[2m | \u001B[22m\r\n\u001B[32mchunk-54LU2G6T.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2mlanding-page\u001B[22m      \u001B[2m | \u001B[22m \u001B[36m36.19 kB\u001B[39m\u001B[2m | \u001B[22m\r\n\u001B[32mchunk-BZBD2JIY.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2m-\u001B[22m                 \u001B[2m | \u001B[22m \u001B[36m25.52 kB\u001B[39m\u001B[2m | \u001B[22m\r\n\u001B[32mchunk-U4G4E5B3.js\u001B[39m  \u001B[2m | \u001B[22m\u001B[2mregister-page\u001B[22m     \u001B[2m | \u001B[22m \u001B[36m22.93 kB\u001B[39m\u001B[2m | \u001B[2\n\u2026[truncated]",
+        "durationMs": 7966
+      }
+    ],
+    "executions": [
+      {
+        "source": "tests-pass",
+        "resolvedExecutable": "C:\\Program Files\\nodejs\\npm.CMD",
+        "args": [
+          "test",
+          "--",
+          "--watch=false"
+        ],
+        "cwd": "C:\\Users\\J.S. CAITLYN MARY\\Music\\lifesync\\frontend\\lifesync",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32"
+      },
+      {
+        "source": "production-build",
+        "resolvedExecutable": "C:\\Program Files\\nodejs\\npm.CMD",
+        "args": [
+          "run",
+          "build"
+        ],
+        "cwd": "C:\\Users\\J.S. CAITLYN MARY\\Music\\lifesync\\frontend\\lifesync",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32"
+      },
+      {
+        "source": "prettier-check",
+        "resolvedExecutable": "C:\\Program Files\\nodejs\\npx.CMD",
+        "args": [
+          "prettier",
+          "--check",
+          "src/app/features/ai-assistant/components/ai-chat-panel.ts",
+          "src/app/features/ai-assistant/components/ai-chat-panel.html",
+          "src/app/features/ai-assistant/components/ai-chat-panel.css",
+          "src/app/features/ai-assistant/components/ai-chat-panel.spec.ts",
+          "src/styles.css",
+          "package.json"
+        ],
+        "cwd": "C:\\Users\\J.S. CAITLYN MARY\\Music\\lifesync\\frontend\\lifesync",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32"
+      },
+      {
+        "source": "angular-app-serves",
+        "resolvedExecutable": "C:\\Program Files\\nodejs\\npm.CMD",
+        "args": [
+          "start",
+          "--",
+          "--host",
+          "127.0.0.1",
+          "--port",
+          "4201"
+        ],
+        "cwd": "C:\\Users\\J.S. CAITLYN MARY\\Music\\lifesync\\frontend\\lifesync",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32"
+      }
+    ]
+  }
+}

@@ -1,0 +1,127 @@
+const QUOTES = [
+  'Progress grows each time you choose to show up.',
+  "Start where you are; today's effort is enough to begin.",
+  'Small steps turn distant goals into familiar ground.',
+  'Consistency makes ordinary moments quietly powerful.',
+  'Your next useful step matters more than a perfect plan.',
+  'Make room for progress, not perfection.',
+  'A little focus today can lighten tomorrow.',
+  'Keep the promise you made to your future self.',
+  'Momentum begins with one honest attempt.',
+  'Patient effort is still powerful effort.',
+  'You are allowed to learn as you go.',
+  'Growth often starts just beyond your comfort.',
+  "Every new skill begins with a beginner's question.",
+  'Change takes root in choices repeated with care.',
+  'Your pace can be gentle and still move you forward.',
+  'Learning is progress you can carry anywhere.',
+  'You can outgrow a plan and keep the purpose.',
+  'One brave adjustment can open a better path.',
+  'Becoming takes time; let yourself take it.',
+  "Your effort is shaping more than today's result.",
+  'Discipline is kindness to the goals you care about.',
+  'Begin before confidence arrives; let action invite it.',
+  'Focus on the next step, then choose another.',
+  'A routine can hold you steady when motivation wanders.',
+  'You do not need a perfect day to make progress.',
+  'Finish one small thing and let that be a win.',
+  'Decide what matters, then give it your attention.',
+  'Follow-through turns good intentions into trust.',
+  'Your best work grows from steady care.',
+  'Rest with purpose; return with clarity.',
+  'You already have reasons to believe in yourself.',
+  'Your voice belongs in the room.',
+  'Confidence grows when you keep meeting yourself with courage.',
+  'You can be new at something and still be capable.',
+  'Let your curiosity be louder than your doubt.',
+  'You do not need permission to try.',
+  'Your worth is not measured by your output.',
+  'Take up space in the life you are building.',
+  'The version of you who keeps trying is already strong.',
+  'You can trust yourself to learn the next part.',
+  'Hope can be quiet and still carry you.',
+  'A hard day is one chapter, not the whole story.',
+  'You have made it through days you once thought impossible.',
+  'Setbacks can redirect you without defining you.',
+  'Give yourself the same patience you offer others.',
+  'There is strength in beginning again.',
+  'You can feel uncertain and still take a meaningful step.',
+  'Brighter moments often begin with a small act of care.',
+  'Resilience is returning to what matters, one choice at a time.',
+  'Let today hold a little more possibility than yesterday.',
+  'Notice how far your small efforts have brought you.',
+  'Progress counts even when no one else sees it.',
+  'Five focused minutes can change the shape of a day.',
+  'A tiny habit is a vote for the person you hope to become.',
+  'Every page starts with a first line.',
+  'Small wins are still wins; let them count.',
+  'One clear task can make room for a calmer mind.',
+  "Your daily practice is building tomorrow's confidence.",
+  'Keep the steps manageable and the direction meaningful.',
+  'Little by little is still a way forward.',
+  'A fresh start can be as simple as your next choice.',
+  'Make today useful in a way that feels human.',
+  'Your attention is a resource; spend it where you care.',
+  'Choose progress you can repeat.',
+  'A thoughtful pause can be the start of a better decision.',
+  'Protect a little time for what helps you grow.',
+  'When plans change, your purpose can stay.',
+  'You can edit the approach without shrinking the dream.',
+  'Make space for the work that brings you closer.',
+  'Take the lesson; leave the harsh judgment.',
+  'You are not behind; you are moving from where you are.',
+  'A slower season can still be a growing season.',
+  'Your future is shaped by the care you practice now.',
+  'Give your goals a calendar and your mind some grace.',
+  'Try again with more wisdom than last time.',
+  'You can hold ambition and balance at once.',
+  'Let curiosity turn obstacles into questions.',
+  'The right next step is often smaller than you think.',
+  'Your effort matters before the outcome appears.',
+  'Good habits make room for more meaningful choices.',
+  'Lead yourself with patience, then with action.',
+  'Make one choice today that your future self will thank you for.',
+  "Your path does not need to look like anyone else's.",
+  'Quiet progress is still progress.',
+  'You have permission to change your mind and keep growing.',
+  'Courage can look like asking for help.',
+  'Start again without starting over.',
+  'A clear boundary can protect a meaningful goal.',
+  'You can learn from a mistake without becoming it.',
+  'Keep your standards kind enough to sustain.',
+  'Turn your energy toward what you can influence.',
+  'A consistent beginning is more valuable than a perfect finish.',
+  'Your small actions are teaching your mind to trust you.',
+  'Give the important things your best available, not imaginary, time.',
+  'You can make today count without making it flawless.',
+  'Take a breath; the next step will still be there.',
+  'Your growth is real, even when it feels gradual.',
+  'Carry forward what worked and release what did not.',
+  'Every day offers a chance to practice becoming.',
+  'Keep going; the distance is changing with each step.',
+] as const;
+
+const DAY_IN_MILLISECONDS = 86_400_000;
+// This step visits all 100 quotes before returning to the first one.
+const QUOTE_INDEX_STEP = 37;
+const QUOTE_INDEX_OFFSET = 13;
+
+export interface DailyInspiration {
+  quote: string;
+  author: string;
+}
+
+export function getDailyInspiration(date: Date): DailyInspiration {
+  const localDay = Math.floor(
+    Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) /
+      DAY_IN_MILLISECONDS,
+  );
+  const indexValue =
+    (localDay * QUOTE_INDEX_STEP + QUOTE_INDEX_OFFSET) % QUOTES.length;
+  const index = (indexValue + QUOTES.length) % QUOTES.length;
+
+  return {
+    quote: QUOTES[index],
+    author: 'LifeSync',
+  };
+}

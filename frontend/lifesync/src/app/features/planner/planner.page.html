@@ -1,0 +1,198 @@
+<div class="mx-auto flex max-w-7xl flex-col gap-5">
+  <section class="ls-card ls-title-card ls-title-card--lavender-blue flex flex-col gap-4 bg-ls-surface p-5 sm:flex-row sm:items-center sm:justify-between sm:p-7">
+    <div>
+      <p class="ls-title-eyebrow text-sm font-bold uppercase tracking-[0.14em]">Daily execution</p>
+      <h1 class="mt-1 text-3xl font-extrabold tracking-tight text-plum dark:text-cream sm:text-4xl">Planner</h1>
+      <p class="mt-2 text-sm font-medium text-ls-text/70">
+        Turn your priorities into an actionable daily plan.
+      </p>
+    </div>
+    <button
+      type="button"
+      class="rounded-xl bg-lime px-4 py-2.5 text-sm font-extrabold text-plum shadow-soft hover:bg-mint"
+      (click)="beginCreateSchedule()"
+    >
+      + Block time
+    </button>
+  </section>
+
+  @if (message(); as text) {
+    <p class="rounded-2xl bg-mint/35 px-4 py-3 text-sm font-semibold text-ls-text" role="status">{{ text }}</p>
+  }
+  @if (error(); as text) {
+    <div class="flex flex-col gap-3 rounded-2xl bg-ls-surface-2 px-4 py-3 text-sm font-semibold text-ls-text sm:flex-row sm:items-center sm:justify-between" role="alert">
+      <span>{{ text }}</span>
+      <button type="button" class="rounded-lg bg-plum px-3 py-2 text-xs font-bold text-cream" (click)="loadPlanner()">Retry</button>
+    </div>
+  }
+
+  @if (loading()) {
+    <p class="ls-card bg-ls-surface px-4 py-8 text-center text-sm font-semibold text-ls-text-muted" role="status">Loading your tasks and schedule…</p>
+  } @else {
+    <section class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4" aria-label="Daily progress">
+      <article class="ls-card bg-[var(--ls-card-tasks)] p-4">
+        <p class="text-xs font-extrabold uppercase tracking-wide text-purple">Today's progress</p>
+        <p class="mt-2 text-2xl font-extrabold text-ls-text">{{ dayProgress().completed }} / {{ dayProgress().total }}</p>
+        <div class="mt-3 h-2 overflow-hidden rounded-full bg-ls-bg" role="progressbar" [attr.aria-valuenow]="dayProgress().percentage" aria-valuemin="0" aria-valuemax="100">
+          <div class="h-full rounded-full bg-lime transition-all" [style.width.%]="dayProgress().percentage"></div>
+        </div>
+      </article>
+      <article class="ls-card bg-ls-surface-2/70 p-4">
+        <p class="text-xs font-extrabold uppercase tracking-wide text-burgundy">Overdue</p>
+        <p class="mt-2 text-2xl font-extrabold text-ls-text">{{ overdueTasks().length }}</p>
+        <p class="mt-1 text-xs text-ls-text-muted">Pending past their deadline</p>
+      </article>
+      <article class="ls-card bg-mint/25 p-4">
+        <p class="text-xs font-extrabold uppercase tracking-wide text-purple">Pending work</p>
+        <p class="mt-2 text-2xl font-extrabold text-ls-text">{{ pendingTasks().length }}</p>
+        <p class="mt-1 text-xs text-ls-text-muted">Open tasks across your list</p>
+      </article>
+      <article class="ls-card bg-ls-surface p-4">
+        <p class="text-xs font-extrabold uppercase tracking-wide text-purple">Upcoming</p>
+        <p class="mt-2 text-2xl font-extrabold text-ls-text">{{ upcomingTasks().length }}</p>
+        <p class="mt-1 text-xs text-ls-text-muted">Tasks with future deadlines</p>
+      </article>
+    </section>
+
+    <app-daily-plan-panel (approved)="loadPlanner()" />
+
+    <section class="grid gap-5 xl:grid-cols-[minmax(0,1.3fr)_minmax(18rem,0.7fr)]">
+      <div class="ls-card bg-[var(--ls-card-tasks)] p-4 sm:p-5">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p class="text-xs font-extrabold uppercase tracking-[0.14em] text-purple">Execution list</p>
+            <h2 class="mt-1 text-xl font-extrabold text-plum dark:text-cream">Today's priorities</h2>
+          </div>
+          <a routerLink="/tasks" class="text-xs font-bold text-purple underline">All tasks</a>
+        </div>
+        @if (todayTasks().length === 0) {
+          <p class="mt-4 rounded-2xl bg-ls-surface px-4 py-7 text-center text-sm text-ls-text-muted">
+            No tasks due or time-blocked today. Review pending work or add a time block.
+          </p>
+        } @else {
+          <ul class="mt-4 space-y-2">
+            @for (task of todayTasks(); track task.id) {
+              <li class="flex flex-col gap-3 rounded-2xl border border-ls-border bg-ls-surface p-3 sm:flex-row sm:items-center sm:justify-between">
+                <div class="min-w-0">
+                  <div class="flex flex-wrap items-center gap-2">
+                    <h3 class="text-sm font-extrabold text-ls-text">{{ task.title }}</h3>
+                    <span class="rounded-full px-2 py-1 text-[10px] font-extrabold" [class]="priorityClass(task.priority)">{{ task.priority }}</span>
+                  </div>
+                  <p class="mt-1 text-xs text-ls-text-muted">{{ task.status.replace('_', ' ') }} · {{ formatDueDate(task.dueDate) }}</p>
+                </div>
+                @if (isPending(task)) {
+                  <button type="button" class="shrink-0 rounded-lg bg-plum px-3 py-2 text-xs font-bold text-cream" (click)="completeTask(task)">Mark complete</button>
+                } @else {
+                  <span class="shrink-0 rounded-lg bg-mint/35 px-3 py-2 text-xs font-bold text-ls-text">Completed</span>
+                }
+              </li>
+            }
+          </ul>
+        }
+      </div>
+
+      <div class="flex flex-col gap-5">
+        <section class="ls-card bg-ls-surface p-4 sm:p-5">
+          <div class="flex items-center justify-between gap-2">
+            <div>
+              <p class="text-xs font-extrabold uppercase tracking-[0.14em] text-purple">Time blocks</p>
+              <h2 class="mt-1 text-lg font-extrabold text-plum dark:text-cream">Today's schedule</h2>
+            </div>
+            <a routerLink="/calendar" class="text-xs font-bold text-purple underline">Calendar</a>
+          </div>
+          @if (todaySchedules().length === 0) {
+            <p class="mt-3 rounded-xl bg-ls-bg px-3 py-5 text-center text-xs text-ls-text-muted">No time blocks today.</p>
+          } @else {
+            <ol class="mt-3 space-y-2">
+              @for (slot of todaySchedules(); track slot.id) {
+                <li class="flex items-start justify-between gap-3 rounded-xl bg-ls-bg p-3">
+                  <div class="min-w-0">
+                    <p class="text-xs font-extrabold text-ls-text">{{ slot.title }}</p>
+                    <p class="mt-1 text-[11px] text-ls-text-muted">{{ formatTime(slot.startDateTime) }} – {{ formatTime(slot.endDateTime) }}</p>
+                  </div>
+                  <button type="button" class="shrink-0 text-xs font-bold text-purple underline" (click)="editSchedule(slot)">Reschedule</button>
+                </li>
+              }
+            </ol>
+          }
+        </section>
+
+        <section class="ls-card bg-ls-surface-2/35 p-4 sm:p-5">
+          <h2 class="text-lg font-extrabold text-plum dark:text-cream">Overdue</h2>
+          @if (overdueTasks().length === 0) {
+            <p class="mt-2 text-xs text-ls-text-muted">Nothing overdue. Nice work.</p>
+          } @else {
+            <ul class="mt-3 space-y-2">
+              @for (task of overdueTasks(); track task.id) {
+                <li class="rounded-xl bg-ls-surface p-3">
+                  <p class="text-xs font-bold text-ls-text">{{ task.title }}</p>
+                  <p class="mt-1 text-[11px] text-ls-text-muted">{{ task.priority }} · {{ formatDueDate(task.dueDate) }}</p>
+                </li>
+              }
+            </ul>
+          }
+        </section>
+
+        <section class="ls-card bg-mint/20 p-4 sm:p-5">
+          <h2 class="text-lg font-extrabold text-plum dark:text-cream">Coming up</h2>
+          @if (upcomingTasks().length === 0) {
+            <p class="mt-2 text-xs text-ls-text-muted">No upcoming task deadlines.</p>
+          } @else {
+            <ul class="mt-3 space-y-2">
+              @for (task of upcomingTasks().slice(0, 5); track task.id) {
+                <li class="rounded-xl bg-ls-surface p-3">
+                  <p class="text-xs font-bold text-ls-text">{{ task.title }}</p>
+                  <p class="mt-1 text-[11px] text-ls-text-muted">{{ task.priority }} · {{ formatDueDate(task.dueDate) }}</p>
+                </li>
+              }
+            </ul>
+          }
+        </section>
+      </div>
+    </section>
+
+    <section class="ls-card bg-ls-surface p-4 sm:p-5">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <p class="text-xs font-extrabold uppercase tracking-[0.14em] text-purple">Pending work</p>
+          <h2 class="mt-1 text-xl font-extrabold text-plum dark:text-cream">Task queue</h2>
+        </div>
+        <a routerLink="/tasks" class="text-xs font-bold text-purple underline">Manage tasks</a>
+      </div>
+      @if (pendingTasks().length === 0) {
+        <p class="mt-3 rounded-xl bg-ls-bg px-4 py-5 text-sm text-ls-text-muted">No pending tasks.</p>
+      } @else {
+        <ul class="mt-4 grid gap-2 md:grid-cols-2">
+          @for (task of pendingTasks().slice(0, 8); track task.id) {
+            <li class="flex items-center justify-between gap-3 rounded-xl bg-ls-bg p-3">
+              <div class="min-w-0">
+                <p class="truncate text-sm font-bold text-ls-text">{{ task.title }}</p>
+                <p class="mt-1 text-[11px] text-ls-text-muted">{{ task.priority }} · {{ formatDueDate(task.dueDate) }}</p>
+              </div>
+              <button
+                type="button"
+                class="shrink-0 rounded-lg border border-purple/20 px-3 py-2 text-xs font-bold text-purple disabled:opacity-50"
+                [disabled]="!isPending(task) || schedules().some((slot) => slot.taskId === task.id)"
+                (click)="beginCreateSchedule(task.id)"
+              >
+                {{ schedules().some((slot) => slot.taskId === task.id) ? 'Time blocked' : 'Block time' }}
+              </button>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+  }
+
+  @if (scheduleFormOpen()) {
+    <app-schedule-form
+      [slot]="editingSchedule()"
+      [initialTaskId]="scheduleTaskId()"
+      [tasks]="scheduleTasks()"
+      [saving]="savingSchedule()"
+      [requestError]="scheduleFormError()"
+      (save)="saveSchedule($event)"
+      (cancel)="scheduleFormOpen.set(false)"
+    />
+  }
+</div>

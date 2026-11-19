@@ -1,0 +1,328 @@
+<div class="mx-auto flex max-w-7xl flex-col gap-7">
+  <section
+    class="journal-hero ls-title-card ls-title-card--lavender-blue overflow-hidden rounded-[2rem] border border-ls-border bg-ls-surface shadow-[0_16px_38px_-28px_rgba(28,22,120,.16)]"
+  >
+    <div
+      class="grid items-center gap-4 px-5 pt-6 sm:px-8 sm:pt-8 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,.7fr)] lg:gap-8 lg:py-7"
+    >
+      <div class="relative z-10 py-2 lg:py-4">
+        <p class="ls-title-eyebrow font-quote text-2xl font-semibold">A quiet moment, just for you</p>
+        <h1
+          class="mt-1 text-4xl font-extrabold leading-tight tracking-tight text-plum dark:text-cream sm:text-5xl"
+        >
+          Dear, little me
+        </h1>
+        <p class="mt-3 max-w-lg text-sm leading-7 text-plum dark:text-cream sm:text-base">
+          Let the day settle. Keep the small joys, the brave bits, and everything your heart wants
+          to say.
+        </p>
+        <div
+          class="mt-5 inline-flex items-center gap-2 rounded-full border border-white/80 bg-ls-surface/70 px-4 py-2 text-xs font-bold text-plum dark:border-ls-border dark:text-cream"
+        >
+          <span class="text-burgundy" aria-hidden="true">✿</span>
+          One gentle page at a time
+        </div>
+      </div>
+      <div class="journal-illustration-wrap relative mx-auto self-end">
+        <div class="journal-image-frame">
+          <img
+            src="/images/journal-desk.png"
+            alt="A young woman writing in her journal at her desk in a soft lavender evening light"
+            class="h-full w-full object-cover object-center"
+            width="736"
+            height="1104"
+            fetchpriority="high"
+          />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  @if (success(); as message) {
+    <div
+      class="flex items-center justify-between gap-3 rounded-2xl bg-aqua px-4 py-3 text-sm font-semibold text-plum"
+      role="status"
+    >
+      <span>{{ message }}</span>
+      <button
+        type="button"
+        class="rounded-lg px-2 py-1 text-lg"
+        aria-label="Dismiss message"
+        (click)="clearSuccess()"
+      >
+        ×
+      </button>
+    </div>
+  }
+
+  <section class="journal-writing-section">
+    <div class="mb-4 flex flex-col gap-3 px-1 sm:flex-row sm:items-end sm:justify-between">
+      <div>
+        <p class="font-quote text-xl font-semibold text-orchid">A page for today</p>
+        <h2 class="text-2xl font-extrabold text-plum dark:text-cream">Let it flow</h2>
+      </div>
+      <div class="flex items-center gap-2">
+        <button
+          type="button"
+          class="journal-date-nav"
+          aria-label="Previous day"
+          [disabled]="dayLoading()"
+          (click)="moveDate(-1)"
+        >
+          ‹
+        </button>
+        <label class="sr-only" for="journal-date">Choose journal date</label>
+        <input
+          id="journal-date"
+          type="date"
+          [ngModel]="selectedDate()"
+          (ngModelChange)="chooseDate($event)"
+          class="h-10 rounded-xl border border-ls-border bg-ls-input px-3 text-xs font-bold text-plum"
+        />
+        <button
+          type="button"
+          class="journal-date-nav"
+          aria-label="Next day"
+          [disabled]="dayLoading()"
+          (click)="moveDate(1)"
+        >
+          ›
+        </button>
+      </div>
+    </div>
+
+    @if (dayError(); as message) {
+      <div
+        class="mb-4 flex flex-col items-start justify-between gap-3 rounded-2xl bg-ls-surface-2 px-4 py-3 text-sm font-semibold text-plum sm:flex-row sm:items-center"
+        role="alert"
+      >
+        <span>{{ message }}</span>
+        <button
+          type="button"
+          class="rounded-xl bg-orchid px-4 py-2 font-bold text-white"
+          (click)="loadJournalDay(selectedDate())"
+        >
+          Try again
+        </button>
+      </div>
+    }
+    @if (saveError(); as message) {
+      <p
+        class="mb-4 rounded-2xl bg-ls-surface-2 px-4 py-3 text-sm font-semibold text-plum"
+        role="alert"
+      >
+        {{ message }}
+      </p>
+    }
+    @if (dayLoading()) {
+      <div
+        class="journal-paper flex min-h-96 items-center justify-center rounded-[1.75rem] border border-ls-border bg-ls-surface p-8 text-center text-sm font-semibold text-plum/70"
+        role="status"
+      >
+        Opening your page…
+      </div>
+    } @else {
+      <form
+        class="journal-paper relative rounded-[1.75rem] border border-ls-border bg-ls-surface p-5 shadow-[0_12px_30px_-24px_rgba(23,39,73,.16)] sm:p-8 lg:p-10"
+        [formGroup]="form"
+        (ngSubmit)="saveEntry()"
+      >
+        <span class="journal-corner journal-corner-top-left" aria-hidden="true">🎀</span>
+        <span class="journal-corner journal-corner-top-right" aria-hidden="true">✿</span>
+        <span class="journal-corner journal-corner-bottom-left" aria-hidden="true">✿</span>
+        <span class="journal-corner journal-corner-bottom-right" aria-hidden="true">🎀</span>
+        <div class="journal-paper-inner">
+          <div
+            class="flex flex-col gap-2 border-b border-ls-border pb-4 sm:flex-row sm:items-end sm:justify-between"
+          >
+            <div>
+              <p class="font-quote text-lg font-semibold text-orchid">
+                {{ formatDate(selectedDate()) }}
+              </p>
+              <p class="mt-1 text-[11px] font-semibold uppercase tracking-[.16em] text-ls-text-muted">
+                {{ entry() ? 'A memory you kept' : 'Today belongs to you' }}
+              </p>
+            </div>
+            @if (entry()) {
+              <span
+                class="rounded-full bg-ls-surface-2 px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-wide text-orchid"
+                >Saved page</span
+              >
+            }
+          </div>
+
+          <label class="mt-5 block">
+            <span class="sr-only">Journal title</span>
+            <input
+              type="text"
+              formControlName="title"
+              maxlength="200"
+              placeholder="A title for this little moment…"
+              class="journal-title-input w-full bg-transparent px-1 py-2 text-3xl font-semibold text-plum placeholder:text-ls-text-muted focus:ring-0 sm:text-4xl"
+            />
+            @if (form.controls.title.touched && form.controls.title.invalid) {
+              <span class="mt-1 block text-xs font-semibold text-burgundy"
+                >Please add a title (up to 200 characters).</span
+              >
+            }
+          </label>
+
+          <label class="mt-4 block">
+            <span class="sr-only">Journal entry</span>
+            <textarea
+              rows="12"
+              maxlength="50000"
+              formControlName="content"
+              placeholder="Start anywhere. What made you smile today? What are you still holding? This page is yours…"
+              class="journal-lines w-full resize-y bg-transparent px-1 py-2 text-[15px] leading-8 text-plum placeholder:text-ls-text-muted focus:ring-0 sm:text-base"
+            ></textarea>
+            @if (form.controls.content.touched && form.controls.content.invalid) {
+              <span class="mt-1 block text-xs font-semibold text-burgundy"
+                >Write a little something before saving (up to 50,000 characters).</span
+              >
+            }
+          </label>
+          <div
+            class="mt-3 flex flex-col gap-3 border-t border-ls-border pt-4 sm:flex-row sm:items-center sm:justify-between"
+          >
+            <p class="text-[11px] font-medium text-ls-text-muted">
+              {{
+                entry()
+                  ? 'One entry is kept for each date.'
+                  : 'Your entry is saved only when you choose Save.'
+              }}
+            </p>
+            <div class="flex flex-wrap justify-end gap-2">
+              <button
+                type="button"
+                class="rounded-xl border border-ls-border px-4 py-2.5 text-sm font-bold text-plum hover:bg-ls-surface disabled:opacity-60"
+                [disabled]="saving()"
+                (click)="resetEntry()"
+              >
+                Reset
+              </button>
+              <button
+                type="submit"
+                class="rounded-xl bg-lime px-5 py-2.5 text-sm font-extrabold text-plum shadow-sm hover:bg-mint disabled:opacity-60"
+                [disabled]="saving() || dayError() !== null"
+              >
+                {{ saving() ? 'Saving…' : entry() ? 'Save changes' : 'Save entry' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
+    }
+  </section>
+
+  <section class="pb-5">
+    <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+      <div>
+        <p class="font-quote text-xl font-semibold text-orchid">The moments you gathered</p>
+        <h2 class="text-2xl font-extrabold text-plum dark:text-cream">My Memory Garden</h2>
+      </div>
+      <div class="grid gap-2 sm:grid-cols-[minmax(12rem,1fr)_auto]">
+        <label>
+          <span class="sr-only">Search journal entries</span>
+          <input
+            type="search"
+            [ngModel]="historySearch()"
+            (ngModelChange)="historySearch.set($event)"
+            placeholder="Search memories…"
+            class="h-10 w-full rounded-xl border border-ls-border bg-ls-input px-3 text-xs text-plum placeholder:text-ls-text-muted"
+          />
+        </label>
+        <label>
+          <span class="sr-only">Filter by journal date</span>
+          <input
+            type="date"
+            [ngModel]="historyDate()"
+            (ngModelChange)="historyDate.set($event)"
+            class="h-10 w-full rounded-xl border border-ls-border bg-ls-input px-3 text-xs font-semibold text-plum"
+          />
+        </label>
+      </div>
+    </div>
+
+    @if (historyError(); as message) {
+      <div
+        class="flex flex-col items-start justify-between gap-3 rounded-2xl bg-ls-surface-2 px-4 py-3 text-sm font-semibold text-plum sm:flex-row sm:items-center"
+        role="alert"
+      >
+        <span>{{ message }}</span>
+        <button
+          type="button"
+          class="rounded-xl bg-orchid px-4 py-2 font-bold text-white"
+          (click)="loadHistory()"
+        >
+          Try again
+        </button>
+      </div>
+    } @else if (historyLoading() && history().length === 0) {
+      <div
+        class="rounded-3xl border border-ls-border bg-ls-surface px-4 py-10 text-center text-sm font-semibold text-plum/70"
+        role="status"
+      >
+        Gathering your memories…
+      </div>
+    } @else if (journalEntries().length === 0) {
+      <div
+        class="rounded-3xl border border-dashed border-ls-border bg-ls-surface px-5 py-10 text-center"
+      >
+        <span class="text-3xl text-orchid" aria-hidden="true">♡</span>
+        <p class="mt-2 text-sm font-bold text-plum">
+          {{
+            historySearch() || historyDate()
+              ? 'No entries match this little search.'
+              : 'Your memory garden is ready to grow.'
+          }}
+        </p>
+        <p class="mt-1 text-xs text-ls-text-muted">
+          Saved journal pages will appear here, just as you wrote them.
+        </p>
+      </div>
+    } @else {
+      <ol class="journal-timeline relative space-y-4">
+        @for (note of journalEntries(); track note.id; let index = $index) {
+          <li class="relative pl-7 sm:pl-10">
+            <span class="journal-timeline-dot" aria-hidden="true">{{
+              index % 2 === 0 ? '✿' : '♡'
+            }}</span>
+            <article
+              class="rounded-[1.5rem] border border-ls-border bg-ls-surface p-4 shadow-[0_10px_28px_-26px_rgba(74,43,105,.5)] sm:p-5"
+            >
+              <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div class="min-w-0">
+                  <p class="font-quote text-lg font-semibold text-orchid">
+                    {{ formatShortDate(note.journalDate) }}
+                  </p>
+                  <h3 class="mt-0.5 text-lg font-extrabold text-plum">{{ note.title }}</h3>
+                </div>
+                <div class="flex shrink-0 gap-2">
+                  <button
+                    type="button"
+                    class="rounded-xl bg-ls-surface-2 px-3 py-2 text-xs font-bold text-plum hover:bg-ls-surface-2"
+                    (click)="openHistoryEntry(note)"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    type="button"
+                    class="rounded-xl border border-ls-border px-3 py-2 text-xs font-bold text-burgundy hover:bg-ls-surface disabled:opacity-60"
+                    [disabled]="deletingId() === note.id"
+                    (click)="deleteEntry(note)"
+                  >
+                    {{ deletingId() === note.id ? 'Removing…' : 'Delete' }}
+                  </button>
+                </div>
+              </div>
+              <p class="mt-3 line-clamp-4 whitespace-pre-line text-sm leading-7 text-plum">
+                {{ note.content }}
+              </p>
+            </article>
+          </li>
+        }
+      </ol>
+    }
+  </section>
+</div>

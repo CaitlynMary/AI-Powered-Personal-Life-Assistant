@@ -1,0 +1,135 @@
+<div class="relative">
+  <button
+    type="button"
+    class="relative inline-flex h-11 w-11 items-center justify-center rounded-full border border-ls-border bg-[var(--ls-header-search)] text-ls-text shadow-soft transition hover:border-soft-pink"
+    [attr.aria-label]="
+      state.unreadCount() === null
+        ? 'Notifications'
+        : 'Notifications, ' + state.unreadCount() + ' unread'
+    "
+    [attr.aria-expanded]="open()"
+    aria-haspopup="dialog"
+    aria-controls="header-notification-panel"
+    (click)="toggle()"
+    (keydown.escape)="close()"
+  >
+    <svg lucideIcon="bell" [size]="18"></svg>
+    @if ((state.unreadCount() ?? 0) > 0) {
+      <span
+        class="absolute -right-1 -top-1 flex min-h-5 min-w-5 items-center justify-center rounded-full bg-ls-surface-2 px-1 text-[9px] font-extrabold text-ls-text ring-2 ring-[var(--ls-header-search)]"
+      >
+        {{ state.unreadCount()! > 99 ? '99+' : state.unreadCount() }}
+      </span>
+    }
+  </button>
+
+  @if (open()) {
+    <section
+      id="header-notification-panel"
+      class="absolute right-0 top-full z-50 mt-2 w-[min(22rem,calc(100vw-1.5rem))] overflow-hidden rounded-2xl border border-ls-border bg-ls-surface shadow-card"
+      role="dialog"
+      aria-label="Recent notifications"
+    >
+      <header class="flex items-start justify-between gap-3 border-b border-ls-border px-4 py-3">
+        <div>
+          <h2 class="text-sm font-extrabold text-plum dark:text-cream">Notifications</h2>
+          <p class="mt-0.5 text-[11px] text-ls-text-muted">{{ state.unreadCount() ?? 0 }} unread</p>
+        </div>
+        <button
+          type="button"
+          class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xl leading-none text-ls-text-muted transition hover:bg-ls-bg hover:text-ls-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-navy"
+          aria-label="Close notifications"
+          (click)="close()"
+        >
+          ×
+        </button>
+      </header>
+
+      @if (actionError(); as message) {
+        <p
+          class="mx-3 mt-3 rounded-xl bg-ls-surface-2 px-3 py-2 text-xs font-semibold text-ls-text"
+          role="alert"
+        >
+          {{ message }}
+        </p>
+      }
+
+      @if (state.recentLoading() && state.recent().length === 0) {
+        <p class="px-4 py-8 text-center text-xs font-semibold text-ls-text-muted" role="status">
+          Loading notifications…
+        </p>
+      } @else if (state.recentError(); as message) {
+        <div class="px-4 py-6 text-center">
+          <p class="text-xs font-semibold text-ls-text-muted" role="alert">{{ message }}</p>
+          <button
+            type="button"
+            class="mt-2 text-xs font-bold text-purple"
+            (click)="state.refreshRecent()"
+          >
+            Try again
+          </button>
+        </div>
+      } @else if (state.recent().length === 0) {
+        <p class="px-4 py-8 text-center text-xs font-semibold text-ls-text-muted">
+          You’re all caught up. No notifications yet.
+        </p>
+      } @else {
+        <ul class="max-h-80 divide-y divide-ls-border overflow-y-auto">
+          @for (notification of state.recent(); track notification.id) {
+            <li
+              class="flex gap-3 px-4 py-3"
+              [class]="notification.isRead ? 'bg-ls-surface' : 'bg-soft-pink/20'"
+            >
+              <span
+                class="mt-1 h-2.5 w-2.5 shrink-0 rounded-full"
+                [class]="notification.isRead ? 'bg-ls-border' : 'bg-purple'"
+                aria-hidden="true"
+              ></span>
+              <div class="min-w-0 flex-1">
+                <p class="line-clamp-1 text-xs font-extrabold text-ls-text">
+                  {{ notification.title }}
+                </p>
+                <p class="mt-0.5 line-clamp-2 text-[11px] leading-5 text-ls-text-muted">
+                  {{ notification.message }}
+                </p>
+                <div class="mt-1 flex flex-wrap items-center justify-between gap-2">
+                  <span class="text-[10px] font-medium text-ls-text-muted">{{
+                    formatDate(notification.createdAt)
+                  }}</span>
+                  @if (!notification.isRead) {
+                    <button
+                      type="button"
+                      class="text-[10px] font-extrabold text-purple disabled:opacity-50"
+                      [disabled]="busyId() === notification.id"
+                      (click)="markRead(notification)"
+                    >
+                      {{ busyId() === notification.id ? 'Saving…' : 'Mark read' }}
+                    </button>
+                  }
+                </div>
+              </div>
+            </li>
+          }
+        </ul>
+      }
+
+      <footer class="flex items-center justify-between gap-2 border-t border-ls-border px-4 py-3">
+        <button
+          type="button"
+          class="text-[11px] font-bold text-ls-text-muted hover:text-ls-text disabled:opacity-40"
+          [disabled]="busyAll() || (state.unreadCount() ?? 0) === 0"
+          (click)="markAllRead()"
+        >
+          {{ busyAll() ? 'Saving…' : 'Mark all read' }}
+        </button>
+        <a
+          routerLink="/notifications"
+          class="rounded-lg bg-plum px-3 py-2 text-[11px] font-extrabold text-cream hover:bg-plum/90"
+          (click)="close()"
+        >
+          View all
+        </a>
+      </footer>
+    </section>
+  }
+</div>

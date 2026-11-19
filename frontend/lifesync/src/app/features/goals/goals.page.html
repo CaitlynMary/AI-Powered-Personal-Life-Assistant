@@ -1,0 +1,410 @@
+<div class="mx-auto flex max-w-7xl flex-col gap-5">
+  <section
+    class="ls-card ls-title-card ls-title-card--white-indigo flex flex-col gap-4 bg-ls-surface p-5 sm:flex-row sm:items-center sm:justify-between sm:p-7"
+  >
+    <div>
+      <p class="ls-title-eyebrow text-sm font-bold uppercase tracking-[0.14em]">
+        Big dreams, clear steps
+      </p>
+      <h1 class="mt-1 text-3xl font-extrabold tracking-tight text-plum dark:text-cream sm:text-4xl">Your Goals</h1>
+      <p class="mt-2 text-sm font-medium text-ls-text/70">
+        Track what matters and celebrate every milestone.
+      </p>
+    </div>
+    <button
+      type="button"
+      class="rounded-2xl bg-lime px-5 py-3 text-sm font-extrabold text-plum shadow-soft transition hover:bg-mint"
+      (click)="beginCreateGoal()"
+    >
+      + Create goal
+    </button>
+  </section>
+
+  @if (success(); as message) {
+    <div
+      class="flex items-center justify-between gap-3 rounded-2xl bg-mint/35 px-4 py-3 text-sm font-semibold text-ls-text"
+      role="status"
+    >
+      <span>{{ message }}</span>
+      <button
+        type="button"
+        class="rounded-lg px-2 py-1 font-bold"
+        aria-label="Dismiss message"
+        (click)="clearSuccess()"
+      >
+        ×
+      </button>
+    </div>
+  }
+  @if (actionError(); as message) {
+    <p class="rounded-2xl bg-ls-surface-2 px-4 py-3 text-sm font-semibold text-ls-text" role="alert">
+      {{ message }}
+    </p>
+  }
+
+  <section class="ls-card bg-ls-surface p-4 sm:p-5">
+    <div class="grid gap-3 sm:grid-cols-3">
+      <label class="sm:col-span-1">
+        <span class="sr-only">Search goals</span>
+        <input
+          type="search"
+          name="goalSearch"
+          [ngModel]="searchText()"
+          (ngModelChange)="searchText.set($event)"
+          placeholder="Search goals…"
+          class="h-11 w-full rounded-xl border border-ls-border bg-ls-input px-3 text-sm text-ls-text focus:border-navy"
+        />
+      </label>
+      <label>
+        <span class="sr-only">Filter goals by status</span>
+        <select
+          name="goalStatus"
+          [ngModel]="statusFilter()"
+          (ngModelChange)="updateStatusFilter($event)"
+          class="h-11 w-full rounded-xl border border-ls-border bg-ls-input px-3 text-sm text-ls-text"
+        >
+          <option value="">All statuses</option>
+          <option value="NOT_STARTED">Not started</option>
+          <option value="IN_PROGRESS">In progress</option>
+          <option value="COMPLETED">Completed</option>
+          <option value="OVERDUE">Overdue</option>
+          <option value="CANCELLED">Cancelled</option>
+        </select>
+      </label>
+      <label>
+        <span class="sr-only">Filter goals by type</span>
+        <select
+          name="goalType"
+          [ngModel]="typeFilter()"
+          (ngModelChange)="updateTypeFilter($event)"
+          class="h-11 w-full rounded-xl border border-ls-border bg-ls-input px-3 text-sm text-ls-text"
+        >
+          <option value="">All goal types</option>
+          <option value="WEEKLY">Weekly</option>
+          <option value="MONTHLY">Monthly</option>
+          <option value="YEARLY">Yearly</option>
+        </select>
+      </label>
+    </div>
+  </section>
+
+  <section class="ls-card bg-[var(--ls-card-goals)] p-4 sm:p-6">
+    <div class="mb-4 flex items-center justify-between gap-3">
+      <div>
+        <h2 class="ls-section-title">Goals & milestones</h2>
+        <p class="mt-1 text-xs font-medium text-ls-text-muted">
+          Progress and status are sourced from your LifeSync account.
+        </p>
+      </div>
+      @if (loading()) {
+        <span class="text-xs font-semibold text-ls-text-muted" role="status">Syncing…</span>
+      }
+    </div>
+
+    @if (error(); as message) {
+      <div
+        class="flex flex-col items-start justify-between gap-3 rounded-2xl bg-ls-surface-2 px-4 py-4 text-sm font-semibold text-ls-text sm:flex-row sm:items-center"
+        role="alert"
+      >
+        <span>{{ message }}</span>
+        <button
+          type="button"
+          class="rounded-xl bg-plum px-4 py-2 font-bold text-cream"
+          (click)="loadGoals()"
+        >
+          Retry
+        </button>
+      </div>
+    } @else if (loading() && goals().length === 0) {
+      <div class="py-12 text-center text-sm font-semibold text-ls-text-muted" role="status">
+        Loading your goals…
+      </div>
+    } @else if (visibleGoals().length === 0) {
+      <div class="rounded-2xl bg-ls-surface/75 px-4 py-12 text-center">
+        <p class="text-lg font-extrabold text-ls-text">
+          {{ goals().length === 0 ? 'No goals yet' : 'No goals match these filters' }}
+        </p>
+        <p class="mt-1 text-sm font-medium text-ls-text-muted">
+          {{
+            goals().length === 0
+              ? 'Create a goal and break it into manageable milestones.'
+              : 'Try a different search or filter.'
+          }}
+        </p>
+      </div>
+    } @else {
+      <div class="grid gap-4 xl:grid-cols-2">
+        @for (goal of visibleGoals(); track goal.id) {
+          <article
+            class="rounded-3xl border border-ls-border bg-ls-surface p-4 shadow-soft sm:p-5"
+            [class.border-burgundy]="goal.status === 'OVERDUE'"
+          >
+            <div class="flex flex-col gap-4">
+              <div class="flex items-start gap-3">
+                <span
+                  class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-aqua/50 text-xl"
+                  aria-hidden="true"
+                  >✦</span
+                >
+                <div class="min-w-0 flex-1">
+                  <div class="flex flex-wrap items-center gap-2">
+                    <h3 class="break-words text-lg font-extrabold text-ls-text">
+                      {{ goal.title }}
+                    </h3>
+                    <span
+                      class="rounded-full bg-soft-pink px-2.5 py-1 text-[11px] font-bold text-ls-text"
+                      >{{ goalTypeLabel(goal.goalType) }}</span
+                    >
+                    <span
+                      class="rounded-full px-2.5 py-1 text-[11px] font-bold"
+                      [class]="statusClass(goal.status)"
+                      >{{ statusLabel(goal.status) }}</span
+                    >
+                  </div>
+                  <p class="mt-1 whitespace-pre-line text-sm text-ls-text-muted">
+                    {{ goal.description || 'No description' }}
+                  </p>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3 rounded-2xl bg-ls-bg px-3 py-3 text-xs sm:text-sm">
+                <div>
+                  <span class="block font-semibold text-ls-text-muted">Starts</span
+                  ><span class="font-bold text-ls-text">{{ formatDate(goal.startDate) }}</span>
+                </div>
+                <div>
+                  <span class="block font-semibold text-ls-text-muted">Target</span
+                  ><span class="font-bold text-ls-text">{{ formatDate(goal.targetDate) }}</span>
+                </div>
+              </div>
+              @if (goal.status === 'OVERDUE') {
+                <p class="rounded-xl bg-burgundy/10 px-3 py-2 text-sm font-semibold text-burgundy" role="status">
+                  This deadline has passed. Extend the target date or continue working on this goal.
+                </p>
+              }
+
+              <div>
+                <div class="mb-2 flex items-center justify-between gap-2">
+                  <span class="text-xs font-extrabold uppercase tracking-wide text-ls-text-muted"
+                    >Goal progress</span
+                  >
+                  <span class="text-sm font-extrabold text-ls-text"
+                    >{{ goal.progressPercentage }}%</span
+                  >
+                </div>
+                <div
+                  class="h-3 overflow-hidden rounded-full bg-ls-bg"
+                  role="progressbar"
+                  [attr.aria-valuenow]="goal.progressPercentage"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                  [attr.aria-label]="goal.title + ' progress'"
+                >
+                  <div
+                    class="h-full rounded-full bg-lime transition-all duration-500"
+                    [style.width.%]="goal.progressPercentage"
+                  ></div>
+                </div>
+              </div>
+
+              <div
+                class="flex flex-wrap items-center justify-between gap-3 border-t border-ls-border pt-3"
+              >
+                <span class="text-xs font-semibold text-ls-text-muted">
+                  {{ milestonesFor(goal.id).length }} milestone{{
+                    milestonesFor(goal.id).length === 1 ? '' : 's'
+                  }}
+                </span>
+                <div class="flex flex-wrap items-center gap-2">
+                  <label class="sr-only" [attr.for]="'goal-status-' + goal.id"
+                    >Change goal status</label
+                  >
+                  <select
+                    [id]="'goal-status-' + goal.id"
+                    [ngModel]="goal.status"
+                    [ngModelOptions]="{ standalone: true }"
+                    (ngModelChange)="updateGoalStatus(goal, $event)"
+                    [disabled]="loading() || updatingGoalId() !== null"
+                    [attr.aria-busy]="updatingGoalId() === goal.id"
+                    class="h-9 rounded-lg border border-ls-border bg-ls-input px-2 text-xs font-semibold text-ls-text"
+                  >
+                    @if (goal.status === 'OVERDUE') {
+                      <option value="OVERDUE" disabled>Overdue</option>
+                    }
+                    <option value="NOT_STARTED">Not started</option>
+                    <option value="IN_PROGRESS">In progress</option>
+                    <option value="COMPLETED">Completed</option>
+                    <option value="CANCELLED">Cancelled</option>
+                  </select>
+                  <button
+                    type="button"
+                    class="rounded-lg border border-ls-border px-3 py-2 text-xs font-bold text-ls-text hover:bg-ls-bg"
+                    (click)="beginEditGoal(goal)"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    type="button"
+                    class="rounded-lg border border-ls-border px-3 py-2 text-xs font-bold text-burgundy hover:bg-ls-surface-2/40 disabled:opacity-50"
+                    [disabled]="deletingGoalId() === goal.id"
+                    (click)="deleteGoal(goal)"
+                  >
+                    {{ deletingGoalId() === goal.id ? 'Deleting…' : 'Delete' }}
+                  </button>
+                </div>
+              </div>
+
+              <section
+                class="rounded-2xl bg-[var(--ls-card-tasks)] p-3 sm:p-4"
+                [id]="'goal-milestones-' + goal.id"
+              >
+                <div class="flex items-center justify-between gap-3">
+                  <div>
+                    <h4 class="text-sm font-extrabold text-ls-text">Milestones</h4>
+                    <p class="mt-0.5 text-[11px] text-ls-text-muted">
+                      Steps that move this goal forward
+                    </p>
+                  </div>
+                  <div class="flex flex-wrap items-center gap-2">
+                    <a
+                      [href]="'#goal-milestones-' + goal.id"
+                      class="rounded-xl border border-ls-border px-3 py-2 text-xs font-bold text-ls-text hover:bg-ls-bg"
+                    >View milestones</a>
+                    <button
+                      type="button"
+                      class="rounded-xl bg-lime px-3 py-2 text-xs font-bold text-plum hover:bg-mint"
+                      (click)="beginCreateMilestone(goal)"
+                    >
+                      + Add milestone
+                    </button>
+                  </div>
+                </div>
+
+                @if (milestonesFor(goal.id).length === 0) {
+                  <p
+                    class="mt-3 rounded-xl bg-ls-surface/70 px-3 py-4 text-center text-xs font-medium text-ls-text-muted"
+                  >
+                    No milestones yet. Add the first step for this goal.
+                  </p>
+                } @else {
+                  <ul class="mt-3 space-y-2">
+                    @for (milestone of milestonesFor(goal.id); track milestone.id) {
+                      <li class="rounded-xl border border-ls-border bg-ls-surface/90 px-3 py-3">
+                        <div class="flex items-start gap-2.5">
+                          <button
+                            type="button"
+                            class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border border-navy/30 text-xs font-extrabold text-ls-text disabled:cursor-default disabled:opacity-60"
+                            [class.bg-lime]="milestone.status === 'COMPLETED'"
+                            [attr.aria-label]="
+                              (milestone.status === 'COMPLETED' ? 'Uncheck ' : 'Complete ') +
+                              'milestone ' +
+                              milestone.title
+                            "
+                            [attr.aria-pressed]="milestone.status === 'COMPLETED'"
+                            [disabled]="loading() || updatingMilestoneId() !== null"
+                            (click)="toggleMilestoneCompletion(milestone)"
+                          >
+                            @if (milestone.status === 'COMPLETED') {
+                              ✓
+                            }
+                          </button>
+                          <div class="min-w-0 flex-1">
+                            <div class="flex flex-wrap items-center gap-2">
+                              <span
+                                class="break-words text-sm font-bold text-ls-text"
+                                [class.line-through]="milestone.status === 'COMPLETED'"
+                                >{{ milestone.title }}</span
+                              >
+                              <span
+                                class="rounded-full px-2 py-0.5 text-[10px] font-bold"
+                                [class]="statusClass(milestone.status)"
+                                >{{ statusLabel(milestone.status) }}</span
+                              >
+                            </div>
+                            @if (milestone.description) {
+                              <p class="mt-1 whitespace-pre-line text-xs text-ls-text-muted">
+                                {{ milestone.description }}
+                              </p>
+                            }
+                            <p class="mt-1 text-[11px] font-semibold text-ls-text-muted">
+                              Due {{ formatDate(milestone.targetDate) }}
+                            </p>
+                          </div>
+                          <div class="flex shrink-0 gap-1">
+                            <button
+                              type="button"
+                              class="rounded-lg px-2 py-1 text-[11px] font-bold text-purple hover:bg-purple/10"
+                              (click)="beginEditMilestone(goal, milestone)"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              type="button"
+                              class="rounded-lg px-2 py-1 text-[11px] font-bold text-burgundy hover:bg-ls-surface-2/50 disabled:opacity-50"
+                              [disabled]="deletingMilestoneId() === milestone.id"
+                              (click)="deleteMilestone(milestone)"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </div>
+                      </li>
+                    }
+                  </ul>
+                }
+              </section>
+              @if (goal.status === 'OVERDUE') {
+                <div class="flex flex-wrap gap-2 border-t border-ls-border pt-3">
+                  <button
+                    type="button"
+                    class="rounded-lg border border-burgundy px-3 py-2 text-xs font-bold text-burgundy hover:bg-burgundy/10"
+                    (click)="beginEditGoal(goal)"
+                  >
+                    Extend deadline
+                  </button>
+                  <button
+                    type="button"
+                    class="rounded-lg bg-purple/15 px-3 py-2 text-xs font-bold text-purple hover:bg-purple/25 disabled:opacity-50"
+                    [disabled]="updatingGoalId() !== null"
+                    (click)="updateGoalStatus(goal, 'IN_PROGRESS')"
+                  >
+                    Continue working
+                  </button>
+                  <button
+                    type="button"
+                    class="rounded-lg border border-ls-border px-3 py-2 text-xs font-bold text-burgundy hover:bg-ls-surface-2/40 disabled:opacity-50"
+                    [disabled]="updatingGoalId() !== null"
+                    (click)="updateGoalStatus(goal, 'CANCELLED')"
+                  >
+                    Cancel goal
+                  </button>
+                </div>
+              }
+            </div>
+          </article>
+        }
+      </div>
+    }
+  </section>
+
+  @if (goalFormOpen()) {
+    <app-goal-form
+      [goal]="selectedGoal()"
+      [saving]="saving()"
+      [requestError]="goalFormError()"
+      (save)="saveGoal($event)"
+      (cancel)="goalFormOpen.set(false)"
+    />
+  }
+  @if (milestoneFormOpen() && milestoneGoal(); as goal) {
+    <app-milestone-form
+      [milestone]="selectedMilestone()"
+      [goalStartDate]="goal.startDate"
+      [goalTargetDate]="goal.targetDate"
+      [saving]="saving()"
+      [requestError]="milestoneFormError()"
+      (save)="saveMilestone($event)"
+      (cancel)="milestoneFormOpen.set(false)"
+    />
+  }
+</div>

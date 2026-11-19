@@ -1,0 +1,523 @@
+<div class="mx-auto flex max-w-7xl flex-col gap-5">
+  <section
+    class="ls-card ls-title-card ls-title-card--white-indigo flex flex-col gap-4 bg-ls-surface p-5 sm:flex-row sm:items-center sm:justify-between sm:p-7"
+  >
+    <div>
+      <p class="ls-title-eyebrow text-sm font-bold uppercase tracking-[0.14em]">Scheduling overview</p>
+      <h1 class="mt-1 text-3xl font-extrabold tracking-tight text-plum dark:text-cream sm:text-4xl">Calendar</h1>
+      <p class="mt-2 text-sm font-medium text-ls-text/70">
+        See your schedule across days, weeks and months.
+      </p>
+    </div>
+    <div class="flex flex-wrap gap-2">
+      <button
+        type="button"
+        class="rounded-xl border border-navy/15 bg-ls-surface px-4 py-2.5 text-sm font-extrabold text-ls-text hover:bg-ls-bg"
+        (click)="beginCreateSchedule()"
+      >
+        + Schedule
+      </button>
+      <button
+        type="button"
+        class="rounded-xl bg-lime px-4 py-2.5 text-sm font-extrabold text-plum shadow-soft hover:bg-mint"
+        (click)="beginCreateEvent()"
+      >
+        + Event
+      </button>
+    </div>
+  </section>
+
+  @if (success(); as message) {
+    <div
+      class="flex items-center justify-between gap-3 rounded-2xl bg-mint/35 px-4 py-3 text-sm font-semibold text-ls-text"
+      role="status"
+    >
+      <span>{{ message }}</span>
+      <button
+        type="button"
+        class="rounded-lg px-2 py-1 font-bold"
+        aria-label="Dismiss message"
+        (click)="clearSuccess()"
+      >
+        ×
+      </button>
+    </div>
+  }
+  @if (actionError(); as message) {
+    <p class="rounded-2xl bg-ls-surface-2 px-4 py-3 text-sm font-semibold text-ls-text" role="alert">
+      {{ message }}
+    </p>
+  }
+
+  <section class="ls-card bg-ls-surface p-4 sm:p-5">
+    <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+      <div class="flex flex-wrap items-center gap-2">
+        <button
+          type="button"
+          class="rounded-xl border border-ls-border px-3 py-2 text-lg font-bold text-ls-text hover:bg-ls-bg disabled:opacity-50"
+          aria-label="Previous period"
+          [disabled]="loading()"
+          (click)="navigate(-1)"
+        >
+          ‹
+        </button>
+        <button
+          type="button"
+          class="rounded-xl border border-ls-border px-4 py-2 text-sm font-bold text-ls-text hover:bg-ls-bg disabled:opacity-50"
+          [disabled]="loading()"
+          (click)="goToday()"
+        >
+          Today
+        </button>
+        <button
+          type="button"
+          class="rounded-xl border border-ls-border px-3 py-2 text-lg font-bold text-ls-text hover:bg-ls-bg disabled:opacity-50"
+          aria-label="Next period"
+          [disabled]="loading()"
+          (click)="navigate(1)"
+        >
+          ›
+        </button>
+        <h2 class="ml-1 text-xl font-extrabold text-plum dark:text-cream sm:ml-2">{{ rangeLabel() }}</h2>
+        @if (loading()) {
+          <span class="ml-1 text-xs font-semibold text-ls-text-muted" role="status">Loading…</span>
+        }
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        <div class="flex rounded-xl bg-ls-bg p-1" role="group" aria-label="Calendar view">
+          <button
+            type="button"
+            class="rounded-lg px-3 py-2 text-xs font-extrabold transition"
+            [class]="
+              view() === 'MONTH' ? 'bg-plum text-cream' : 'text-ls-text-muted hover:text-ls-text'
+            "
+            [attr.aria-pressed]="view() === 'MONTH'"
+            (click)="setView('MONTH')"
+          >
+            Month
+          </button>
+          <button
+            type="button"
+            class="rounded-lg px-3 py-2 text-xs font-extrabold transition"
+            [class]="
+              view() === 'WEEK' ? 'bg-plum text-cream' : 'text-ls-text-muted hover:text-ls-text'
+            "
+            [attr.aria-pressed]="view() === 'WEEK'"
+            (click)="setView('WEEK')"
+          >
+            Week
+          </button>
+          <button
+            type="button"
+            class="rounded-lg px-3 py-2 text-xs font-extrabold transition"
+            [class]="
+              view() === 'DAY' ? 'bg-plum text-cream' : 'text-ls-text-muted hover:text-ls-text'
+            "
+            [attr.aria-pressed]="view() === 'DAY'"
+            (click)="setView('DAY')"
+          >
+            Day
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-4 grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto]">
+      <label>
+        <span class="sr-only">Search calendar items</span>
+        <input
+          type="search"
+          name="calendarSearch"
+          [ngModel]="searchText()"
+          (ngModelChange)="searchText.set($event)"
+          placeholder="Search events, schedule entries, or tasks…"
+          class="h-10 w-full rounded-xl border border-ls-border bg-ls-input px-3 text-sm text-ls-text"
+        />
+      </label>
+      <div class="flex flex-wrap items-center gap-3">
+        <label class="flex items-center gap-2 text-xs font-bold text-ls-text">
+          <span>Event type</span>
+          <select
+            name="eventTypeFilter"
+            [ngModel]="eventTypeFilter()"
+            (ngModelChange)="setEventTypeFilter($event)"
+            class="h-10 rounded-xl border border-ls-border bg-ls-input px-2 text-xs text-ls-text"
+          >
+            <option value="">All types</option>
+            <option value="PERSONAL">Personal</option>
+            <option value="WORK">Work</option>
+            <option value="MEETING">Meeting</option>
+            <option value="TASK">Task</option>
+            <option value="OTHER">Other</option>
+          </select>
+        </label>
+        <label class="flex items-center gap-1.5 text-xs font-bold text-ls-text"
+          ><input
+            type="checkbox"
+            [ngModel]="showSchedules()"
+            (ngModelChange)="showSchedules.set($event)"
+            [ngModelOptions]="{ standalone: true }"
+            class="accent-plum"
+          />Schedule</label
+        >
+        <label class="flex items-center gap-1.5 text-xs font-bold text-ls-text"
+          ><input
+            type="checkbox"
+            [ngModel]="showTasks()"
+            (ngModelChange)="showTasks.set($event)"
+            [ngModelOptions]="{ standalone: true }"
+            class="accent-plum"
+          />Tasks due</label
+        >
+      </div>
+    </div>
+  </section>
+
+  @if (error(); as message) {
+    <div
+      class="ls-card flex flex-col items-start justify-between gap-3 bg-ls-surface-2 px-4 py-4 text-sm font-semibold text-ls-text sm:flex-row sm:items-center"
+      role="alert"
+    >
+      <span>{{ message }}</span>
+      <button
+        type="button"
+        class="rounded-xl bg-plum px-4 py-2 font-bold text-cream"
+        (click)="loadCalendar()"
+      >
+        Retry
+      </button>
+    </div>
+  } @else {
+    <section class="ls-card bg-[var(--ls-card-goals)] p-3 sm:p-5">
+      @if (view() === 'MONTH') {
+        <div class="grid grid-cols-7 gap-1 sm:gap-2">
+          @for (dayName of dayNames(); track dayName) {
+            <div
+              class="py-2 text-center text-[10px] font-extrabold uppercase tracking-wide text-ls-text-muted sm:text-xs"
+            >
+              {{ dayName }}
+            </div>
+          }
+          @for (date of monthCells(); track $index) {
+            @if (date; as day) {
+              <button
+                type="button"
+                class="min-h-16 rounded-xl border p-1.5 text-left transition hover:border-navy sm:min-h-24 sm:rounded-2xl sm:p-2"
+                [class]="
+                  selectedDate() === day
+                    ? 'border-navy bg-ls-surface ring-2 ring-navy/15'
+                    : isToday(day)
+                      ? 'border-navy/40 bg-navy/5'
+                      : 'border-ls-border bg-ls-surface/75'
+                "
+                [attr.aria-label]="formatDate(day) + ', ' + countForDate(day) + ' calendar items'"
+                [attr.aria-pressed]="selectedDate() === day"
+                (click)="selectDate(day)"
+              >
+                <span class="flex items-center justify-between gap-1">
+                  <span
+                    class="flex h-6 w-6 items-center justify-center rounded-full text-xs font-extrabold text-plum"
+                    [class.bg-lime]="isToday(day)"
+                    >{{ +day.slice(-2) }}</span
+                  >
+                  @if (countForDate(day)) {
+                    <span
+                      class="rounded-full bg-plum/10 px-1.5 py-0.5 text-[9px] font-bold text-ls-text"
+                      >{{ countForDate(day) }}</span
+                    >
+                  }
+                </span>
+                <span class="mt-1.5 hidden space-y-1 sm:block">
+                  @for (
+                    entry of entriesForDate(day).slice(0, 2);
+                    track entry.source + entry.id + entry.start
+                  ) {
+                    <span
+                      class="block truncate rounded-md px-1.5 py-1 text-[9px] font-bold"
+                      [class]="sourceClass(entry.source, entry.eventType)"
+                      >{{
+                        entry.source === 'TASK'
+                          ? 'Task · '
+                          : entry.source === 'SCHEDULE'
+                            ? 'Plan · '
+                            : ''
+                      }}{{ entry.title }}</span
+                    >
+                  }
+                  @if (countForDate(day) > 2) {
+                    <span class="block px-1 text-[9px] font-bold text-ls-text-muted"
+                      >+{{ countForDate(day) - 2 }} more</span
+                    >
+                  }
+                </span>
+              </button>
+            } @else {
+              <span class="min-h-16 sm:min-h-24" aria-hidden="true"></span>
+            }
+          }
+        </div>
+      } @else if (view() === 'WEEK') {
+        <div class="grid gap-3 md:grid-cols-2 xl:grid-cols-7">
+          @for (date of weekDates(); track date) {
+            <button
+              type="button"
+              class="min-h-32 rounded-2xl border p-3 text-left transition hover:border-navy"
+              [class]="
+                selectedDate() === date
+                  ? 'border-navy bg-ls-surface ring-2 ring-navy/15'
+                  : isToday(date)
+                    ? 'border-navy/40 bg-navy/5'
+                    : 'border-ls-border bg-ls-surface/75'
+              "
+              [attr.aria-pressed]="selectedDate() === date"
+              (click)="selectDate(date)"
+            >
+              <span class="flex items-center justify-between">
+                <span class="text-xs font-extrabold text-ls-text">{{ weekdayLabel(date) }}</span>
+                <span class="text-sm font-extrabold text-ls-text">{{ +date.slice(-2) }}</span>
+              </span>
+              <span class="mt-2 block space-y-1">
+                @for (
+                  entry of entriesForDate(date).slice(0, 4);
+                  track entry.source + entry.id + entry.start
+                ) {
+                  <span
+                    class="block truncate rounded-md px-1.5 py-1 text-[9px] font-bold"
+                    [class]="sourceClass(entry.source, entry.eventType)"
+                    >{{ entry.title }}</span
+                  >
+                }
+                @if (countForDate(date) > 4) {
+                  <span class="block text-[9px] font-bold text-ls-text-muted"
+                    >+{{ countForDate(date) - 4 }} more</span
+                  >
+                }
+              </span>
+            </button>
+          }
+        </div>
+      } @else {
+        <div class="rounded-2xl bg-ls-surface p-4 sm:p-6">
+          <div class="mb-4 flex items-center justify-between">
+            <div>
+              <p class="text-xs font-extrabold uppercase tracking-wide text-purple">Selected day</p>
+              <h3 class="mt-1 text-xl font-extrabold text-ls-text">
+                {{ formatDate(selectedDate()) }}
+              </h3>
+            </div>
+            <span class="rounded-full bg-powder-blue px-3 py-1.5 text-xs font-bold text-plum"
+              >{{ selectedEntries().length }} items</span
+            >
+          </div>
+          @if (selectedEntries().length === 0) {
+            <p
+              class="rounded-xl bg-ls-bg px-4 py-8 text-center text-sm font-medium text-ls-text-muted"
+            >
+              Nothing scheduled for this date yet.
+            </p>
+          } @else {
+            <ol
+              class="relative space-y-3 before:absolute before:bottom-3 before:left-[5.5rem] before:top-3 before:w-px before:bg-ls-border sm:before:left-24"
+            >
+              @for (entry of selectedEntries(); track entry.source + entry.id + entry.start) {
+                <li
+                  class="relative grid grid-cols-[4.5rem_1.5rem_minmax(0,1fr)] items-start gap-2 sm:grid-cols-[5rem_1.5rem_minmax(0,1fr)]"
+                >
+                  <span class="pt-2 text-right text-xs font-bold text-ls-text-muted">{{
+                    entry.allDay ? 'All day' : formatTime(entry.start)
+                  }}</span>
+                  <span
+                    class="relative z-10 mt-2 h-3 w-3 rounded-full ring-4 ring-ls-surface"
+                    [class]="
+                      entry.source === 'EVENT'
+                        ? 'bg-purple'
+                        : entry.source === 'SCHEDULE'
+                          ? 'bg-mint'
+                          : 'bg-rose'
+                    "
+                  ></span>
+                  <article
+                    class="rounded-2xl border border-ls-border bg-ls-surface px-3 py-3 shadow-soft sm:px-4"
+                  >
+                    <div class="flex flex-wrap items-center gap-2">
+                      <span
+                        class="rounded-full px-2.5 py-1 text-[10px] font-extrabold"
+                        [class]="sourceClass(entry.source, entry.eventType)"
+                        >{{
+                          entry.source === 'EVENT' && entry.eventType
+                            ? typeLabel(entry.eventType)
+                            : sourceLabel(entry.source)
+                        }}</span
+                      >
+                      @if (entry.status) {
+                        <span
+                          class="rounded-full px-2 py-1 text-[10px] font-bold"
+                          [class]="entry.source === 'TASK' ? taskStatusClass(entry.status) : 'bg-ls-bg text-ls-text-muted'"
+                          >{{ entry.status.replace('_', ' ') }}</span
+                        >
+                      }
+                      @if (entry.recurrenceType && entry.recurrenceType !== 'NONE') {
+                        <span class="text-[10px] font-semibold text-purple"
+                          >Repeats {{ entry.recurrenceType.toLowerCase() }}</span
+                        >
+                      }
+                    </div>
+                    <h4 class="mt-2 text-sm font-extrabold text-ls-text">{{ entry.title }}</h4>
+                    @if (entry.description) {
+                      <p class="mt-1 whitespace-pre-line text-xs text-ls-text-muted">
+                        {{ entry.description }}
+                      </p>
+                    }
+                    @if (entry.end) {
+                      <p class="mt-1 text-[11px] font-semibold text-ls-text-muted">
+                        {{
+                          entry.allDay
+                            ? 'All-day'
+                            : formatTime(entry.start) + ' – ' + formatTime(entry.end)
+                        }}
+                      </p>
+                    }
+                    @if (entry.linkedTaskTitle) {
+                      <p class="mt-1 text-[11px] font-semibold text-purple">
+                        Linked task: {{ entry.linkedTaskTitle }}
+                      </p>
+                    }
+                    @if (entry.source === 'EVENT') {
+                      <div class="mt-3 flex justify-end gap-2">
+                        <button
+                          type="button"
+                          class="rounded-lg border border-ls-border px-3 py-1.5 text-xs font-bold text-ls-text"
+                          (click)="editEvent(data().events.find((item) => item.id === entry.id)!)"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          type="button"
+                          class="rounded-lg border border-ls-border px-3 py-1.5 text-xs font-bold text-burgundy"
+                          [disabled]="deletingEventId() === entry.id"
+                          (click)="deleteEvent(data().events.find((item) => item.id === entry.id)!)"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    } @else if (entry.source === 'SCHEDULE') {
+                      <div class="mt-3 flex justify-end gap-2">
+                        <button
+                          type="button"
+                          class="rounded-lg border border-ls-border px-3 py-1.5 text-xs font-bold text-ls-text"
+                          (click)="
+                            editSchedule(data().schedules.find((item) => item.id === entry.id)!)
+                          "
+                        >
+                          Edit
+                        </button>
+                        <button
+                          type="button"
+                          class="rounded-lg border border-ls-border px-3 py-1.5 text-xs font-bold text-burgundy"
+                          [disabled]="deletingScheduleId() === entry.id"
+                          (click)="
+                            deleteSchedule(data().schedules.find((item) => item.id === entry.id)!)
+                          "
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    } @else if (entry.source === 'TASK') {
+                      <a
+                        routerLink="/tasks"
+                        class="mt-3 inline-flex rounded-lg bg-plum px-3 py-1.5 text-xs font-bold text-cream"
+                        >Open Tasks</a
+                      >
+                    } @else {
+                      <p class="mt-3 text-[11px] font-semibold text-ls-text-muted">
+                        {{ sourceLabel(entry.source) }} details
+                      </p>
+                    }
+                  </article>
+                </li>
+              }
+            </ol>
+          }
+        </div>
+      }
+    </section>
+
+    <section class="ls-card bg-[var(--ls-card-tasks)] p-4 sm:p-5">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <p class="text-xs font-extrabold uppercase tracking-[0.14em] text-purple">
+            Selected date
+          </p>
+          <h2 class="mt-1 text-xl font-extrabold text-plum dark:text-cream">{{ formatDate(selectedDate()) }}</h2>
+          <p class="mt-1 text-xs text-ls-text-muted">
+            Review events, deadlines, reminders, milestones, habits, and time blocks.
+          </p>
+        </div>
+        <button
+          type="button"
+          class="rounded-xl bg-lime px-4 py-2.5 text-sm font-bold text-plum"
+          (click)="beginCreateSchedule()"
+        >
+          + Add schedule entry
+        </button>
+      </div>
+      @if (selectedEntries().length === 0) {
+        <p
+          class="mt-4 rounded-2xl bg-ls-surface px-4 py-8 text-center text-sm font-medium text-ls-text-muted"
+        >
+          No items for this date. Add an event or schedule entry, or set a task due date in Tasks.
+        </p>
+      } @else {
+        <ul class="mt-4 grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+          @for (entry of selectedEntries(); track entry.source + entry.id + entry.start) {
+            <li class="rounded-2xl border border-ls-border bg-ls-surface p-3">
+              <div class="flex items-center justify-between gap-2">
+                <span
+                  class="rounded-full px-2.5 py-1 text-[10px] font-extrabold"
+                  [class]="sourceClass(entry.source, entry.eventType)"
+                  >{{
+                    entry.source === 'EVENT' && entry.eventType
+                      ? typeLabel(entry.eventType)
+                      : sourceLabel(entry.source)
+                  }}</span
+                >
+                <span class="text-[11px] font-bold text-ls-text-muted">{{
+                  entry.allDay ? 'All day' : formatTime(entry.start)
+                }}</span>
+              </div>
+              <p class="mt-2 text-sm font-extrabold text-ls-text">{{ entry.title }}</p>
+              @if (entry.status) {
+                <p class="mt-1 inline-flex rounded-full px-2 py-1 text-xs font-semibold"
+                  [class]="entry.source === 'TASK' ? taskStatusClass(entry.status) : 'bg-ls-bg text-ls-text-muted'">
+                  {{ entry.status.replace('_', ' ') }}
+                </p>
+              }
+            </li>
+          }
+        </ul>
+      }
+    </section>
+  }
+
+  @if (eventFormOpen()) {
+    <app-calendar-event-form
+      [event]="editingEvent()"
+      [tasks]="data().tasks"
+      [saving]="savingEvent()"
+      [requestError]="eventFormError()"
+      (save)="saveEvent($event)"
+      (cancel)="eventFormOpen.set(false)"
+    />
+  }
+  @if (scheduleFormOpen()) {
+    <app-schedule-form
+      [slot]="editingSchedule()"
+      [tasks]="data().tasks"
+      [conflicts]="conflicts()"
+      [saving]="savingSchedule()"
+      [requestError]="scheduleFormError()"
+      (save)="saveSchedule($event)"
+      (cancel)="scheduleFormOpen.set(false)"
+    />
+  }
+</div>

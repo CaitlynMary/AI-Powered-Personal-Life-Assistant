@@ -1,0 +1,292 @@
+<section class="ai-chat-panel ls-card relative flex flex-col overflow-hidden">
+  <header
+    class="ai-chat-panel__header relative z-10 flex flex-wrap items-center justify-between gap-4"
+  >
+    <div class="flex min-w-0 items-center gap-3 sm:gap-4">
+      <div class="ai-chat-panel__avatar ai-chat-panel__avatar--large" aria-hidden="true">
+        <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M32 9v8" stroke="var(--accent-magenta)" stroke-width="3" stroke-linecap="round" />
+          <circle cx="32" cy="8" r="4" fill="var(--aqua)" />
+          <rect x="12" y="18" width="40" height="34" rx="13" fill="var(--robot-body)" />
+          <rect x="18" y="24" width="28" height="18" rx="8" fill="var(--robot-screen)" />
+          <circle cx="26" cy="33" r="3" fill="var(--aqua)" />
+          <circle cx="38" cy="33" r="3" fill="var(--aqua)" />
+          <path
+            d="M26 39c3 3 9 3 12 0"
+            stroke="var(--rose)"
+            stroke-width="2.5"
+            stroke-linecap="round"
+          />
+          <path d="M9 34H5m54 0h-4" stroke="var(--rose)" stroke-width="3" stroke-linecap="round" />
+          <circle cx="4" cy="34" r="2" fill="var(--aqua)" />
+          <circle cx="60" cy="34" r="2" fill="var(--aqua)" />
+        </svg>
+        <span class="ai-chat-panel__avatar-sparkle">✦</span>
+      </div>
+      <div class="min-w-0">
+        <p class="text-xs font-extrabold uppercase tracking-[0.16em] text-orchid">LifeSync AI</p>
+        <h2 class="mt-0.5 text-xl font-extrabold tracking-tight text-plum dark:text-cream sm:text-2xl">
+          Chat with LifeSync AI
+        </h2>
+        <p class="mt-1 max-w-2xl text-xs leading-5 text-ls-text-muted sm:text-sm">
+          Your personal AI assistant for a more organized and productive life.
+        </p>
+      </div>
+    </div>
+
+    <div class="ml-auto flex items-center gap-2">
+      <span class="ai-chat-panel__session-pill hidden sm:inline-flex">
+        <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <path d="M10 5v5l3 2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+          <circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.5" />
+        </svg>
+        Session history
+      </span>
+      <button
+        type="button"
+        class="ai-chat-panel__new-chat"
+        [disabled]="loading() || messages().length === 0"
+        (click)="clearConversation()"
+        aria-label="Clear chat and start a new conversation"
+      >
+        <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <path
+            d="M10 4v12M4 10h12"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+          />
+        </svg>
+        <span>New chat</span>
+      </button>
+    </div>
+  </header>
+
+  <div
+    #conversation
+    class="ai-chat-panel__conversation relative z-0 flex-1 space-y-5 overflow-y-auto px-4 py-6 sm:px-7 sm:py-8"
+    aria-live="polite"
+    aria-label="Chat conversation"
+  >
+    <div class="ai-chat-panel__decoration ai-chat-panel__decoration--cloud" aria-hidden="true">
+      <svg viewBox="0 0 90 45" fill="none">
+        <path
+          d="M22 35h46a13 13 0 0 0 1-26 18 18 0 0 0-34-1 14 14 0 0 0-13 27Z"
+          fill="var(--bg-elevated)"
+          fill-opacity=".72"
+          stroke="var(--powder-blue)"
+          stroke-width="1.5"
+        />
+      </svg>
+    </div>
+    <div class="ai-chat-panel__decoration ai-chat-panel__decoration--stars" aria-hidden="true">
+      ✦ <span>✧</span> ✦
+    </div>
+
+    @if (messages().length === 0) {
+      <div
+        class="ai-chat-panel__welcome mx-auto flex max-w-xl flex-col items-center px-2 py-8 text-center sm:py-12"
+      >
+        <div class="ai-chat-panel__welcome-orbit" aria-hidden="true">
+          <span class="ai-chat-panel__welcome-star">✦</span>
+          <div class="ai-chat-panel__avatar ai-chat-panel__avatar--welcome">
+            <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M32 9v8" stroke="var(--accent-magenta)" stroke-width="3" stroke-linecap="round" />
+              <circle cx="32" cy="8" r="4" fill="var(--aqua)" />
+              <rect x="12" y="18" width="40" height="34" rx="13" fill="var(--robot-body)" />
+              <rect x="18" y="24" width="28" height="18" rx="8" fill="var(--robot-screen)" />
+              <circle cx="26" cy="33" r="3" fill="var(--aqua)" />
+              <circle cx="38" cy="33" r="3" fill="var(--aqua)" />
+              <path
+                d="M26 39c3 3 9 3 12 0"
+                stroke="var(--rose)"
+                stroke-width="2.5"
+                stroke-linecap="round"
+              />
+            </svg>
+          </div>
+          <span class="ai-chat-panel__welcome-heart">♡</span>
+        </div>
+        <p class="mt-4 text-xs font-extrabold uppercase tracking-[0.18em] text-orchid">
+          A little clarity, one step at a time
+        </p>
+        <h3 class="mt-2 font-quote text-3xl font-semibold leading-tight text-plum sm:text-4xl">
+          A thoughtful place to begin
+        </h3>
+        <p class="mt-3 max-w-lg text-sm leading-6 text-plum/80 sm:text-base">
+          Ask about your routines or plans. When relevant, LifeSync can use your account details to
+          make the answer more personal.
+        </p>
+        <div class="mt-6 flex flex-wrap justify-center gap-2.5">
+          @for (question of suggestions; track question) {
+            <button
+              type="button"
+              class="ai-chat-panel__suggestion"
+              [disabled]="loading()"
+              (click)="askSuggestion(question)"
+            >
+              <span aria-hidden="true">✦</span>
+              {{ question }}
+            </button>
+          }
+        </div>
+        <p class="mt-6 flex items-center gap-2 text-xs font-medium text-plum/80">
+          <span
+            class="h-2 w-2 rounded-full bg-aqua shadow-[0_0_0_3px_rgba(152,232,222,.3)]"
+          ></span>
+          Your conversation stays in this open session
+        </p>
+      </div>
+    } @else {
+      @for (message of messages(); track message.id) {
+        @if (message.role === 'USER') {
+          <div class="ai-chat-panel__message ai-chat-panel__message--user">
+            <article class="ai-chat-panel__bubble ai-chat-panel__bubble--user">
+              <p class="mb-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-white/75">
+                You
+              </p>
+              <p class="whitespace-pre-wrap break-words">{{ message.content }}</p>
+            </article>
+            <span class="ai-chat-panel__user-avatar" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="8" r="3.5" fill="currentColor" />
+                <path d="M5 20a7 7 0 0 1 14 0" fill="currentColor" />
+              </svg>
+            </span>
+          </div>
+        } @else {
+          <div class="ai-chat-panel__message ai-chat-panel__message--assistant">
+            <div class="ai-chat-panel__avatar ai-chat-panel__avatar--small" aria-hidden="true">
+              <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M32 9v8" stroke="var(--accent-magenta)" stroke-width="3" stroke-linecap="round" />
+                <circle cx="32" cy="8" r="4" fill="var(--aqua)" />
+                <rect x="12" y="18" width="40" height="34" rx="13" fill="var(--robot-body)" />
+                <rect x="18" y="24" width="28" height="18" rx="8" fill="var(--robot-screen)" />
+                <circle cx="26" cy="33" r="3" fill="var(--aqua)" />
+                <circle cx="38" cy="33" r="3" fill="var(--aqua)" />
+                <path
+                  d="M26 39c3 3 9 3 12 0"
+                  stroke="var(--rose)"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                />
+              </svg>
+            </div>
+            <article class="ai-chat-panel__bubble ai-chat-panel__bubble--assistant">
+              <div class="mb-2 flex flex-wrap items-center gap-x-2 gap-y-1">
+                <p class="text-xs font-extrabold text-orchid">LifeSync AI</p>
+                <span class="ai-chat-panel__assistant-tag">
+                  <span class="h-1.5 w-1.5 rounded-full bg-plum"></span>
+                  Your personal assistant
+                </span>
+              </div>
+              @if (message.state === 'PENDING') {
+                <p class="ai-chat-panel__thinking" role="status">
+                  <span class="ai-chat-panel__thinking-dots" aria-hidden="true">
+                    <i></i><i></i><i></i>
+                  </span>
+                  Thinking through it…
+                </p>
+              } @else {
+                <div
+                  class="ai-markdown break-words"
+                  [innerHTML]="formatMarkdown(message.content)"
+                ></div>
+                @if (message.state === 'ERROR') {
+                  <button
+                    type="button"
+                    class="ai-chat-panel__retry mt-3"
+                    [disabled]="loading()"
+                    (click)="retry(message)"
+                  >
+                    <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                      <path
+                        d="M16 8a6 6 0 1 0 1 4M16 4v4h-4"
+                        stroke="currentColor"
+                        stroke-width="1.7"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                    Retry answer
+                  </button>
+                }
+              }
+            </article>
+          </div>
+        }
+      }
+    }
+  </div>
+
+  @if (error(); as message) {
+    <p class="ai-chat-panel__error mx-4 mb-2 sm:mx-6" role="alert" aria-live="assertive">
+      <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+        <path
+          d="M10 6v4m0 3h.01M10 2.5l8 14H2l8-14Z"
+          stroke="currentColor"
+          stroke-width="1.6"
+          stroke-linejoin="round"
+        />
+      </svg>
+      {{ message }}
+    </p>
+  }
+
+  <form
+    class="ai-chat-panel__composer relative z-10 border-t p-3 sm:p-5"
+    [formGroup]="form"
+    (ngSubmit)="submit()"
+  >
+    <label class="sr-only" for="ai-message">Message LifeSync AI</label>
+    <div class="ai-chat-panel__input-wrap flex items-end gap-2">
+      <textarea
+        id="ai-message"
+        rows="2"
+        maxlength="4000"
+        formControlName="message"
+        placeholder="Ask me anything about your tasks, goals, habits, schedule or anything else..."
+        class="ai-chat-panel__textarea max-h-36 min-h-14 flex-1 resize-y rounded-2xl border px-4 py-3 text-sm leading-6"
+        (keydown.enter)="onEnter($event)"
+      ></textarea>
+      <button
+        type="submit"
+        class="ai-chat-panel__send h-12 shrink-0 rounded-2xl px-4 transition disabled:cursor-not-allowed disabled:opacity-50 sm:px-5"
+        [disabled]="loading() || form.invalid"
+        [attr.aria-label]="loading() ? 'Waiting for LifeSync AI' : 'Send message'"
+      >
+        @if (loading()) {
+          <span class="ai-chat-panel__send-spinner" aria-hidden="true"></span>
+          <span class="hidden sm:inline">Thinking…</span>
+        } @else {
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path
+              d="m4 5 16 7-16 7 3-7-3-7Zm3 7h13"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          <span class="hidden sm:inline">Send</span>
+        }
+      </button>
+    </div>
+    <div
+      class="mt-2 flex flex-col gap-1 text-[11px] sm:flex-row sm:items-center sm:justify-between"
+    >
+      @if (form.controls.message.touched && form.controls.message.invalid) {
+        <span class="font-semibold text-burgundy">
+          Enter a nonblank message up to 4,000 characters.
+        </span>
+      } @else {
+        <span class="text-plum/80">
+          Relevant LifeSync details may be used. Keep passwords and secrets out of chat.
+        </span>
+      }
+      <span class="self-end font-semibold tabular-nums text-plum/80 sm:self-auto">
+        {{ form.controls.message.value.length }} / 4,000
+      </span>
+    </div>
+  </form>
+</section>

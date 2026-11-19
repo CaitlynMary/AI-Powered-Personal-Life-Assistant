@@ -1,0 +1,309 @@
+<div class="mx-auto flex max-w-7xl flex-col gap-5">
+  <section
+    class="ls-card ls-title-card ls-title-card--mint-blue relative overflow-hidden border border-ls-border bg-ls-surface p-5 sm:p-7"
+  >
+    <span
+      class="pointer-events-none absolute -right-4 -top-8 select-none text-[9rem] leading-none text-purple/10"
+      aria-hidden="true"
+      >♡</span
+    >
+    <div class="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <p class="ls-title-eyebrow font-quote text-xl font-semibold">A gentle nudge for what matters</p>
+        <h1 class="mt-1 text-3xl font-extrabold tracking-tight text-plum dark:text-cream sm:text-4xl">
+          My Reminders
+        </h1>
+        <p class="mt-2 text-sm font-medium text-ls-text/70">
+          Never miss a little or big thing that matters.
+        </p>
+      </div>
+      <button
+        type="button"
+        class="rounded-2xl bg-lime px-5 py-3 text-sm font-extrabold text-plum shadow-soft transition hover:bg-mint"
+        (click)="beginCreate()"
+      >
+        + Create reminder
+      </button>
+    </div>
+  </section>
+
+  @if (success(); as message) {
+    <div
+      class="flex items-center justify-between gap-3 rounded-2xl bg-mint/30 px-4 py-3 text-sm font-semibold text-ls-text"
+      role="status"
+    >
+      <span>{{ message }}</span>
+      <button
+        type="button"
+        class="rounded-lg px-2 py-1 text-lg"
+        aria-label="Dismiss message"
+        (click)="clearMessages()"
+      >
+        ×
+      </button>
+    </div>
+  }
+  @if (actionError(); as message) {
+    <p class="rounded-2xl bg-ls-surface-2 px-4 py-3 text-sm font-semibold text-ls-text" role="alert">
+      {{ message }}
+    </p>
+  }
+
+  <section class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4" aria-label="Reminder summary">
+    <article class="rounded-2xl border border-ls-border bg-ls-surface p-4 shadow-soft">
+      <p class="text-xs font-bold uppercase tracking-wide text-ls-text-muted">Total reminders</p>
+      <p class="mt-2 text-3xl font-extrabold text-ls-text">{{ loading() ? '—' : summary().total }}</p>
+      <span class="mt-1 block text-xs text-ls-text-muted">All your saved nudges</span>
+    </article>
+    <article class="rounded-2xl border border-aqua bg-ls-surface p-4 shadow-soft">
+      <p class="text-xs font-bold uppercase tracking-wide text-plum">Upcoming</p>
+      <p class="mt-2 text-3xl font-extrabold text-plum">
+        {{ loading() ? '—' : summary().upcoming }}
+      </p>
+      <span class="mt-1 block text-xs text-plum">Pending and scheduled for later</span>
+    </article>
+    <article class="rounded-2xl border border-ls-border bg-ls-surface p-4 shadow-soft">
+      <p class="text-xs font-bold uppercase tracking-wide text-purple">Pending</p>
+      <p class="mt-2 text-3xl font-extrabold text-ls-text">
+        {{ loading() ? '—' : summary().pending }}
+      </p>
+      <span class="mt-1 block text-xs text-ls-text-muted">Still waiting to be sent</span>
+    </article>
+    <article class="rounded-2xl border border-ls-border bg-ls-surface p-4 shadow-soft">
+      <p class="text-xs font-bold uppercase tracking-wide text-ls-text-muted">Sent</p>
+      <p class="mt-2 text-3xl font-extrabold text-ls-text">
+        {{ loading() ? '—' : summary().sent }}
+      </p>
+      <span class="mt-1 block text-xs text-ls-text-muted">Handled by the reminder scheduler</span>
+    </article>
+  </section>
+
+  <section class="ls-card border border-ls-border bg-ls-surface p-4 sm:p-5">
+    <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+      <label class="relative sm:col-span-2 xl:col-span-2">
+        <span class="sr-only">Search reminders</span>
+        <input
+          type="search"
+          [ngModel]="searchText()"
+          (ngModelChange)="searchText.set($event); page.set(0)"
+          placeholder="Search titles and messages…"
+          class="h-11 w-full rounded-xl border border-ls-border bg-ls-input px-4 text-sm text-ls-text placeholder:text-ls-text-muted/70"
+        />
+      </label>
+      <label>
+        <span class="sr-only">Filter reminders by status</span>
+        <select
+          [ngModel]="statusFilter()"
+          (ngModelChange)="setStatusFilter($event)"
+          class="h-11 w-full rounded-xl border border-ls-border bg-ls-input px-3 text-sm text-ls-text"
+        >
+          <option value="">All statuses</option>
+          <option value="PENDING">Pending</option>
+          <option value="SENT">Sent</option>
+          <option value="CANCELLED">Cancelled</option>
+        </select>
+      </label>
+      <label>
+        <span class="sr-only">Filter reminders from date</span>
+        <input
+          type="date"
+          [ngModel]="fromDate()"
+          (ngModelChange)="setDateFilter('from', $event)"
+          class="h-11 w-full rounded-xl border border-ls-border bg-ls-input px-3 text-sm text-ls-text"
+        />
+      </label>
+      <label>
+        <span class="sr-only">Filter reminders through date</span>
+        <input
+          type="date"
+          [ngModel]="toDate()"
+          (ngModelChange)="setDateFilter('to', $event)"
+          class="h-11 w-full rounded-xl border border-ls-border bg-ls-input px-3 text-sm text-ls-text"
+        />
+      </label>
+      <label>
+        <span class="sr-only">Sort reminders</span>
+        <select
+          [ngModel]="sortOrder()"
+          (ngModelChange)="setSortOrder($event)"
+          class="h-11 w-full rounded-xl border border-ls-border bg-ls-input px-3 text-sm text-ls-text"
+        >
+          <option value="EARLIEST">Soonest first</option>
+          <option value="LATEST">Latest first</option>
+          <option value="TITLE">Title</option>
+        </select>
+      </label>
+    </div>
+  </section>
+
+  <section class="ls-card border border-ls-border bg-[var(--ls-card-reminders)] p-4 sm:p-5">
+    <div class="mb-4 flex items-center justify-between gap-3">
+      <div>
+        <h2 class="ls-section-title">Your reminders</h2>
+        <p class="mt-1 text-xs font-medium text-ls-text-muted">
+          Reminders are kept in local date and time; the backend creates notifications when they
+          become due.
+        </p>
+      </div>
+      @if (loading()) {
+        <span class="text-xs font-semibold text-ls-text-muted" role="status">Loading…</span>
+      }
+    </div>
+
+    @if (error(); as message) {
+      <div
+        class="flex flex-col items-start justify-between gap-3 rounded-2xl bg-ls-surface-2 px-4 py-4 text-sm font-semibold text-ls-text sm:flex-row sm:items-center"
+        role="alert"
+      >
+        <span>{{ message }}</span>
+        <button
+          type="button"
+          class="rounded-xl bg-plum px-4 py-2 font-bold text-cream"
+          (click)="loadReminders()"
+        >
+          Retry
+        </button>
+      </div>
+    } @else if (loading() && reminders().length === 0) {
+      <div class="py-12 text-center text-sm font-semibold text-ls-text-muted" role="status">
+        Gathering your reminders…
+      </div>
+    } @else if (visibleReminders().length === 0) {
+      <div
+        class="rounded-2xl border border-dashed border-purple/25 bg-ls-surface/45 px-4 py-12 text-center"
+      >
+        <span class="text-4xl text-purple/60" aria-hidden="true">♡</span>
+        <h3 class="mt-3 text-lg font-extrabold text-ls-text">
+          {{
+            reminders().length === 0
+              ? 'A little more breathing room'
+              : 'No reminders match these filters'
+          }}
+        </h3>
+        <p class="mt-1 text-sm text-ls-text-muted">
+          {{
+            reminders().length === 0
+              ? 'Create a reminder for something you want to keep close.'
+              : 'Try a different search, status, or date range.'
+          }}
+        </p>
+        @if (reminders().length === 0) {
+          <button
+            type="button"
+            class="mt-4 rounded-xl bg-lime px-4 py-2.5 text-sm font-bold text-plum"
+            (click)="beginCreate()"
+          >
+            Create a reminder
+          </button>
+        }
+      </div>
+    } @else {
+      <ul class="grid gap-3 lg:grid-cols-2">
+        @for (reminder of visibleReminders(); track reminder.id) {
+          <li
+            class="rounded-2xl border border-ls-border bg-ls-surface px-4 py-4 shadow-soft sm:px-5"
+          >
+            <div class="flex items-start gap-3">
+              <span
+                class="mt-0.5 flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl"
+                [class]="
+                  reminder.status === 'PENDING'
+                    ? 'bg-soft-pink text-ls-text'
+                    : reminder.status === 'SENT'
+                      ? 'bg-mint/30 text-plum'
+                      : 'bg-ls-bg text-ls-text-muted'
+                "
+                aria-hidden="true"
+              >
+                {{ reminder.status === 'SENT' ? '✓' : reminder.status === 'CANCELLED' ? '–' : '♡' }}
+              </span>
+              <div class="min-w-0 flex-1">
+                <div class="flex flex-wrap items-center gap-2">
+                  <h3 class="min-w-0 flex-1 truncate text-sm font-extrabold text-ls-text">
+                    {{ reminder.title }}
+                  </h3>
+                  <span
+                    class="rounded-full bg-ls-bg px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide text-ls-text-muted"
+                    >{{ typeLabel(reminder.reminderType) }}</span
+                  >
+                  <span
+                    class="rounded-full px-2.5 py-1 text-[10px] font-extrabold"
+                    [class]="
+                      reminder.status === 'PENDING'
+                        ? 'bg-ls-surface text-burgundy'
+                        : reminder.status === 'SENT'
+                          ? 'bg-aqua text-plum'
+                          : 'bg-ls-bg text-ls-text-muted'
+                    "
+                  >
+                    {{ statusLabel(reminder.status) }}
+                  </span>
+                </div>
+                <p class="mt-1 whitespace-pre-line text-sm leading-6 text-ls-text-muted">
+                  {{ reminder.message }}
+                </p>
+                <p class="mt-3 flex items-center gap-2 text-xs font-bold text-ls-text">
+                  <span aria-hidden="true">◷</span>
+                  {{ formatDateTime(reminder.reminderDateTime) }}
+                </p>
+                @if (reminder.status === 'PENDING') {
+                  <div class="mt-3 flex justify-end gap-2">
+                    <button
+                      type="button"
+                      class="rounded-lg border border-ls-border px-3 py-1.5 text-xs font-bold text-ls-text"
+                      (click)="beginEdit(reminder)"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      class="rounded-lg border border-ls-border px-3 py-1.5 text-xs font-bold text-burgundy disabled:opacity-50"
+                      [disabled]="cancellingId() === reminder.id"
+                      (click)="cancelReminder(reminder)"
+                    >
+                      {{ cancellingId() === reminder.id ? 'Cancelling…' : 'Cancel' }}
+                    </button>
+                  </div>
+                }
+              </div>
+            </div>
+          </li>
+        }
+      </ul>
+
+      @if (pageCount() > 1) {
+        <nav class="mt-5 flex items-center justify-center gap-3" aria-label="Reminder pages">
+          <button
+            type="button"
+            class="rounded-xl border border-ls-border bg-ls-surface px-3 py-2 text-sm font-bold text-ls-text disabled:opacity-40"
+            [disabled]="page() === 0"
+            (click)="changePage(-1)"
+          >
+            Previous
+          </button>
+          <span class="text-xs font-semibold text-ls-text-muted"
+            >Page {{ page() + 1 }} of {{ pageCount() }}</span
+          >
+          <button
+            type="button"
+            class="rounded-xl border border-ls-border bg-ls-surface px-3 py-2 text-sm font-bold text-ls-text disabled:opacity-40"
+            [disabled]="page() + 1 >= pageCount()"
+            (click)="changePage(1)"
+          >
+            Next
+          </button>
+        </nav>
+      }
+    }
+  </section>
+</div>
+
+@if (editorOpen()) {
+  <app-reminder-form
+    [reminder]="editingReminder()"
+    [saving]="saving()"
+    [requestError]="editorError()"
+    (save)="saveReminder($event)"
+    (cancel)="editorOpen.set(false)"
+  />
+}

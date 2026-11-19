@@ -1,0 +1,107 @@
+<div class="mx-auto flex max-w-7xl flex-col gap-5">
+  @if (loading()) {
+    <p
+      class="rounded-2xl bg-aqua/25 px-4 py-3 text-sm font-semibold text-plum"
+      role="status"
+    >
+      Loading your dashboard…
+    </p>
+  }
+
+  @if (error(); as message) {
+    <div
+      class="flex flex-col gap-3 rounded-2xl bg-ls-surface-2 px-4 py-3 text-sm font-semibold text-plum sm:flex-row sm:items-center sm:justify-between"
+      role="alert"
+    >
+      <span>{{ message }}</span>
+      <button
+        type="button"
+        class="rounded-xl bg-plum px-4 py-2 font-bold text-cream"
+        (click)="loadDashboard()"
+      >
+        Retry
+      </button>
+    </div>
+  }
+
+  @if (taskActionError(); as message) {
+    <div
+      class="flex flex-col gap-3 rounded-2xl bg-ls-surface-2 px-4 py-3 text-sm font-semibold text-plum sm:flex-row sm:items-center sm:justify-between"
+      role="alert"
+    >
+      <span>{{ message }}</span>
+      <button
+        type="button"
+        class="rounded-xl bg-plum px-4 py-2 font-bold text-cream"
+        (click)="taskActionError.set(null)"
+      >
+        Dismiss
+      </button>
+    </div>
+  }
+
+  <app-welcome-banner
+    [greeting]="greeting()"
+    [dateLabel]="dateLabel()"
+    [subtitle]="presentation.subtitle"
+  />
+
+  <section class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+    @if (loading()) {
+      <p
+        class="rounded-2xl bg-aqua/25 px-4 py-3 text-sm font-semibold text-plum sm:col-span-2 xl:col-span-4"
+        role="status"
+      >
+        Loading dashboard statistics…
+      </p>
+    } @else if (error()) {
+      <p
+        class="rounded-2xl bg-ls-surface-2 px-4 py-3 text-sm font-semibold text-plum sm:col-span-2 xl:col-span-4"
+        role="alert"
+      >
+        Dashboard statistics are unavailable. Retry to load them.
+      </p>
+    } @else {
+      @for (stat of stats(); track stat.id) {
+        <app-stat-card [stat]="stat" />
+      }
+    }
+  </section>
+
+  <section class="grid gap-4 xl:grid-cols-3">
+    <div class="xl:col-span-1">
+      <app-todays-tasks
+        [tasks]="tasks()"
+        [loading]="loading()"
+        [hasError]="error() !== null"
+        [updatingTaskId]="updatingTaskId()"
+        (toggleTask)="onToggleTask($event)"
+        (addTask)="onAddTask()"
+      />
+    </div>
+    <div class="xl:col-span-1">
+      <app-goal-progress [goals]="goals()" [loading]="loading()" [hasError]="error() !== null" />
+    </div>
+    <div class="xl:col-span-1">
+      <app-ai-assistant-card
+        [suggestions]="presentation.aiSuggestions"
+        [briefing]="briefing()"
+        (suggestionClick)="onAiSuggestion($event)"
+        (chatClick)="onChatWithAi()"
+      />
+    </div>
+  </section>
+
+  <section class="grid gap-4 lg:grid-cols-3">
+    <app-habit-tracker [habits]="habits()" [loading]="loading()" [hasError]="error() !== null" />
+    <app-upcoming-reminders
+      [reminders]="reminders()"
+      [loading]="loading()"
+      [hasError]="error() !== null"
+    />
+    <app-motivational-quote
+      [quote]="dailyInspiration().quote"
+      [author]="dailyInspiration().author"
+    />
+  </section>
+</div>

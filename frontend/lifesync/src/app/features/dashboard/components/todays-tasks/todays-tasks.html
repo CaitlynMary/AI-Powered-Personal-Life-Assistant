@@ -1,0 +1,79 @@
+<section class="ls-card flex h-full flex-col bg-[var(--ls-card-tasks)] p-5">
+  <div class="mb-4 flex items-center justify-between gap-3">
+    <h2 class="ls-section-title">Today's Tasks</h2>
+    <a
+      routerLink="/tasks"
+      class="text-sm font-bold text-plum underline-offset-2 transition hover:text-orchid hover:underline dark:text-ls-text-muted"
+      >View All</a
+    >
+  </div>
+
+  @if (loading()) {
+    <p class="flex-1 py-8 text-center text-sm font-medium text-ls-text/60" role="status">
+      Loading today's tasks…
+    </p>
+  } @else if (hasError()) {
+    <p class="flex-1 py-8 text-center text-sm font-medium text-ls-text/60">
+      Task data is unavailable. Try refreshing the dashboard.
+    </p>
+  } @else if (tasks().length === 0) {
+    <p class="flex-1 py-8 text-center text-sm font-medium text-ls-text/60">
+      No tasks scheduled for today.
+    </p>
+  } @else {
+    <ul class="flex flex-1 flex-col gap-2.5">
+      @for (task of tasks(); track task.id) {
+        <li
+          class="flex items-center gap-3 rounded-2xl border border-ls-border/60 px-3 py-3 transition"
+          [ngClass]="
+            task.completed
+              ? 'bg-lime'
+              : 'bg-ls-surface/70 hover:bg-ls-surface'
+          "
+        >
+          <button
+            type="button"
+            class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border-2 border-navy/30 bg-ls-surface/70 text-plum transition hover:border-navy disabled:cursor-wait disabled:opacity-50"
+            [attr.aria-pressed]="task.completed"
+            [attr.aria-label]="task.completed ? 'Mark incomplete' : 'Mark complete'"
+            [disabled]="updatingTaskId() === task.id"
+            (click)="toggleTask.emit(task.id)"
+          >
+            @if (task.completed) {
+              <svg lucideIcon="check" [size]="16" strokeWidth="3"></svg>
+            }
+          </button>
+
+          <div class="min-w-0 flex-1">
+            <p
+              class="truncate text-sm font-semibold text-ls-text"
+              [class.line-through]="task.completed"
+              [class.opacity-70]="task.completed"
+            >
+              {{ task.title }}
+            </p>
+            <p class="text-xs font-medium text-ls-text/55">
+              {{ task.dueTime }} · {{ statusLabel(task.status) }}
+            </p>
+          </div>
+
+          <span
+            class="rounded-full px-2.5 py-1 text-[11px] font-bold capitalize"
+            [ngClass]="priorityClass(task.priority)"
+          >
+            {{ task.priority }}
+          </span>
+        </li>
+      }
+    </ul>
+  }
+
+  <button
+    type="button"
+    class="mt-4 inline-flex items-center justify-center gap-2 rounded-2xl bg-lime px-4 py-3 text-sm font-extrabold text-plum transition hover:bg-mint"
+    (click)="addTask.emit()"
+  >
+    <svg lucideIcon="plus" [size]="18"></svg>
+    Add Task
+  </button>
+</section>

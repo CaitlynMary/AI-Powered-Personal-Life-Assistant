@@ -1,0 +1,173 @@
+<div class="fixed inset-0 z-[70] flex items-center justify-center overflow-y-auto bg-plum/45 p-4 backdrop-blur-sm">
+  <section
+    class="my-auto max-h-[calc(100dvh-2rem)] w-full max-w-2xl overflow-y-auto rounded-3xl bg-ls-surface p-5 shadow-card sm:p-7"
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-label]="task() ? 'Edit task' : 'Create task'"
+  >
+    <div class="mb-5 flex items-start justify-between gap-4">
+      <div>
+        <p class="text-xs font-extrabold uppercase tracking-[0.14em] text-purple">Tasks</p>
+        <h2 class="mt-1 text-2xl font-extrabold text-plum dark:text-cream">
+          {{ task() ? 'Edit task' : 'Create a task' }}
+        </h2>
+      </div>
+      <button
+        type="button"
+        class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xl leading-none text-ls-text-muted transition hover:bg-ls-bg hover:text-ls-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-navy"
+        aria-label="Close"
+        (click)="cancel.emit()"
+      >
+        ×
+      </button>
+    </div>
+
+    @if (requestError()) {
+      <p class="mb-4 rounded-2xl bg-ls-surface-2 px-4 py-3 text-sm font-semibold text-ls-text" role="alert">
+        {{ requestError() }}
+      </p>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-4">
+      <label class="block">
+        <span class="mb-1.5 block text-sm font-bold text-ls-text">Title *</span>
+        <input
+          formControlName="title"
+          maxlength="150"
+          class="h-11 w-full rounded-xl border border-ls-border bg-ls-input px-3 text-sm text-ls-text focus:border-navy"
+          placeholder="What needs to be done?"
+        />
+        @if (form.controls.title.touched && form.controls.title.hasError('required')) {
+          <span class="mt-1 block text-xs font-semibold text-burgundy">Task title is required.</span>
+        } @else if (form.controls.title.touched && form.controls.title.hasError('maxlength')) {
+          <span class="mt-1 block text-xs font-semibold text-burgundy">Title cannot exceed 150 characters.</span>
+        }
+      </label>
+
+      <label class="block">
+        <span class="mb-1.5 block text-sm font-bold text-ls-text">Description</span>
+        <textarea
+          formControlName="description"
+          maxlength="2000"
+          rows="3"
+          class="w-full rounded-xl border border-ls-border bg-ls-input px-3 py-2 text-sm text-ls-text focus:border-navy"
+          placeholder="Add helpful details (optional)"
+        ></textarea>
+        @if (form.controls.description.touched && form.controls.description.hasError('maxlength')) {
+          <span class="mt-1 block text-xs font-semibold text-burgundy">Description cannot exceed 2,000 characters.</span>
+        }
+      </label>
+
+      <div class="grid gap-4 sm:grid-cols-2">
+        <label class="block">
+          <span class="mb-1.5 block text-sm font-bold text-ls-text">Category</span>
+          <select
+            formControlName="categoryId"
+            class="h-11 w-full rounded-xl border border-ls-border bg-ls-input px-3 text-sm text-ls-text focus:border-navy"
+          >
+            <option value="">No category</option>
+            @for (category of categories(); track category.id) {
+              <option [value]="category.id">{{ category.name }}</option>
+            }
+          </select>
+        </label>
+
+        <label class="block">
+          <span class="mb-1.5 block text-sm font-bold text-ls-text">Priority *</span>
+          <select
+            formControlName="priority"
+            class="h-11 w-full rounded-xl border border-ls-border bg-ls-input px-3 text-sm text-ls-text focus:border-navy"
+          >
+            <option value="LOW">Low</option>
+            <option value="MEDIUM">Medium</option>
+            <option value="HIGH">High</option>
+            <option value="URGENT">Urgent</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="grid gap-4 sm:grid-cols-2">
+        <label class="block">
+          <span class="mb-1.5 block text-sm font-bold text-ls-text">Start date and time</span>
+          <input
+            type="datetime-local"
+            formControlName="startDate"
+            class="h-11 w-full rounded-xl border border-ls-border bg-ls-input px-3 text-sm text-ls-text focus:border-navy"
+          />
+        </label>
+        <label class="block">
+          <span class="mb-1.5 block text-sm font-bold text-ls-text">Due date and time</span>
+          <input
+            type="datetime-local"
+            formControlName="dueDate"
+            class="h-11 w-full rounded-xl border border-ls-border bg-ls-input px-3 text-sm text-ls-text focus:border-navy"
+          />
+        </label>
+      </div>
+      @if (form.hasError('startAfterDue') && (form.controls.startDate.touched || form.controls.dueDate.touched)) {
+        <p class="-mt-2 text-xs font-semibold text-burgundy" role="alert">
+          Start date and time must be before or equal to the due date and time.
+        </p>
+      }
+
+      <div class="grid gap-4 sm:grid-cols-2">
+        <label class="block">
+          <span class="mb-1.5 block text-sm font-bold text-ls-text">Estimated duration (minutes)</span>
+          <input
+            type="number"
+            min="1"
+            step="1"
+            formControlName="estimatedDuration"
+            class="h-11 w-full rounded-xl border border-ls-border bg-ls-input px-3 text-sm text-ls-text focus:border-navy"
+            placeholder="Optional"
+          />
+          @if (form.controls.estimatedDuration.touched && form.controls.estimatedDuration.invalid) {
+            <span class="mt-1 block text-xs font-semibold text-burgundy">Use a positive whole number.</span>
+          }
+        </label>
+        <div class="flex flex-col justify-center">
+          <label class="flex items-center gap-3 text-sm font-bold text-ls-text">
+            <input
+              type="checkbox"
+              formControlName="recurring"
+              class="h-4 w-4 accent-plum"
+            />
+            Repeat this task
+          </label>
+          @if (form.controls.recurring.value) {
+            <select
+              formControlName="recurrenceType"
+              class="mt-2 h-10 rounded-xl border border-ls-border bg-ls-input px-3 text-sm text-ls-text focus:border-navy"
+            >
+              <option value="NONE" disabled>Select recurrence</option>
+              <option value="DAILY">Daily</option>
+              <option value="WEEKLY">Weekly</option>
+              <option value="MONTHLY">Monthly</option>
+              <option value="YEARLY">Yearly</option>
+            </select>
+          }
+        </div>
+      </div>
+      @if (form.hasError('recurrenceRequired')) {
+        <p class="-mt-2 text-xs font-semibold text-burgundy" role="alert">Choose how often this task repeats.</p>
+      }
+
+      <div class="flex flex-col-reverse justify-end gap-3 pt-2 sm:flex-row">
+        <button
+          type="button"
+          class="rounded-xl border border-ls-border px-5 py-3 text-sm font-bold text-ls-text hover:bg-ls-bg"
+          (click)="cancel.emit()"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          class="rounded-xl bg-lime px-5 py-3 text-sm font-extrabold text-plum transition hover:bg-mint disabled:cursor-wait disabled:opacity-60"
+          [disabled]="saving()"
+        >
+          {{ saving() ? 'Saving…' : task() ? 'Save changes' : 'Create task' }}
+        </button>
+      </div>
+    </form>
+  </section>
+</div>

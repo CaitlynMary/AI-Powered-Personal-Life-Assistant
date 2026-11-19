@@ -1,0 +1,261 @@
+<div class="mx-auto flex max-w-7xl flex-col gap-5">
+  <section
+    class="ls-card ls-title-card ls-title-card--white-indigo relative overflow-hidden border border-ls-border bg-ls-surface p-5 sm:p-7"
+  >
+    <span
+      class="pointer-events-none absolute -right-4 -top-12 select-none text-[11rem] leading-none text-orchid/[0.06]"
+      aria-hidden="true"
+      >✦</span
+    >
+    <div class="relative">
+      <div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+        <div class="max-w-2xl">
+          <p class="ls-title-eyebrow font-quote text-xl font-semibold">
+            A little clarity, one step at a time
+          </p>
+          <h1 class="mt-1 text-3xl font-extrabold tracking-tight text-plum dark:text-cream sm:text-4xl">
+            LifeSync AI
+          </h1>
+          <p class="mt-2 text-sm leading-6 text-ls-text-muted">
+            A thoughtful companion for your plans, routines, and everyday priorities.
+          </p>
+          <p class="mt-2 text-xs font-medium text-ls-text-muted">{{ currentDateLabel() }}</p>
+        </div>
+        <nav
+          class="flex flex-wrap gap-2 rounded-2xl border border-ls-border bg-ls-surface/80 p-1.5"
+          aria-label="AI assistant views"
+        >
+          <button
+            type="button"
+            class="rounded-xl px-4 py-2.5 text-sm font-extrabold transition"
+            [class]="
+              activeTab() === 'CHAT'
+                ? 'bg-orchid text-white shadow-sm'
+                : 'text-orchid hover:bg-powder-blue'
+            "
+            [attr.aria-pressed]="activeTab() === 'CHAT'"
+            (click)="selectTab('CHAT')"
+          >
+            Chat
+          </button>
+          <button
+            type="button"
+            class="rounded-xl px-4 py-2.5 text-sm font-extrabold transition"
+            [class]="
+              activeTab() === 'BRIEFING'
+                ? 'bg-orchid text-white shadow-sm'
+                : 'text-orchid hover:bg-powder-blue'
+            "
+            [attr.aria-pressed]="activeTab() === 'BRIEFING'"
+            (click)="selectTab('BRIEFING')"
+          >
+            Daily Briefing
+          </button>
+        </nav>
+      </div>
+    </div>
+  </section>
+
+  <div [hidden]="activeTab() !== 'CHAT'">
+    <app-ai-chat-panel />
+  </div>
+  <section
+    [hidden]="activeTab() !== 'BRIEFING'"
+    class="ls-card border border-ls-border bg-ls-surface p-4 sm:p-6"
+    aria-labelledby="briefing-title"
+  >
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+      <div>
+        <p class="font-quote text-lg font-semibold text-orchid">
+          Grounded in your LifeSync data
+        </p>
+        <h2 id="briefing-title" class="mt-1 text-2xl font-extrabold text-plum dark:text-cream">
+          Your Daily Briefing
+        </h2>
+        <p class="mt-1 text-sm text-ls-text-muted">
+          A factual snapshot of your tasks, schedule, reminders, and habit progress.
+        </p>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <button
+          type="button"
+          class="rounded-xl border border-ls-border px-3 py-2 text-xs font-bold text-orchid transition hover:bg-powder-blue disabled:opacity-50"
+          [disabled]="briefingLoading()"
+          (click)="refreshBriefing()"
+        >
+          {{ briefingLoading() ? 'Refreshing…' : 'Refresh' }}
+        </button>
+        <button
+          type="button"
+          class="rounded-xl bg-orchid px-3 py-2 text-xs font-bold text-white transition hover:bg-plum"
+          (click)="askForDailyFocus()"
+        >
+          Ask AI for ideas
+        </button>
+      </div>
+    </div>
+
+    @if (briefingLoading() && !briefing()) {
+      <p
+        class="mt-5 rounded-2xl bg-powder-blue px-4 py-7 text-center text-sm font-semibold text-orchid"
+        role="status"
+      >
+        Gathering today’s details…
+      </p>
+    } @else if (briefingError(); as message) {
+      <div
+        class="mt-5 flex flex-col gap-3 rounded-2xl bg-ls-surface-2 px-4 py-4 text-sm font-semibold text-plum sm:flex-row sm:items-center sm:justify-between"
+        role="alert"
+      >
+        <span>{{ message }}</span>
+        <button
+          type="button"
+          class="rounded-lg bg-plum px-3 py-2 text-xs font-bold text-white"
+          (click)="refreshBriefing()"
+        >
+          Try again
+        </button>
+      </div>
+    } @else if (briefing(); as snapshot) {
+      <div class="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-6">
+        <article class="rounded-2xl bg-powder-blue p-4">
+          <p class="text-[10px] font-extrabold uppercase tracking-wide text-orchid">
+            Tasks due today
+          </p>
+          <p class="mt-1 text-2xl font-extrabold text-plum">{{ snapshot.tasksDueToday }}</p>
+          <p class="mt-1 text-xs text-ls-text-muted">{{ snapshot.pendingTasks }} still open</p>
+        </article>
+        <article class="rounded-2xl bg-ls-surface-2 p-4">
+          <p class="text-[10px] font-extrabold uppercase tracking-wide text-burgundy">Overdue</p>
+          <p class="mt-1 text-2xl font-extrabold text-plum">{{ snapshot.overdueTasks }}</p>
+          <p class="mt-1 text-xs text-ls-text-muted">Open tasks past their due time</p>
+        </article>
+        <article class="rounded-2xl bg-ls-surface-2 p-4">
+          <p class="text-[10px] font-extrabold uppercase tracking-wide text-burgundy">Missed</p>
+          <p class="mt-1 text-2xl font-extrabold text-plum">{{ snapshot.missedTasks }}</p>
+          <p class="mt-1 text-xs text-ls-text-muted">Tasks marked as missed</p>
+        </article>
+        <article class="rounded-2xl bg-powder-blue p-4">
+          <p class="text-[10px] font-extrabold uppercase tracking-wide text-orchid">
+            High priority
+          </p>
+          <p class="mt-1 text-2xl font-extrabold text-plum">
+            {{ snapshot.highPriorityTasks }}
+          </p>
+          <p class="mt-1 text-xs text-ls-text-muted">Across your tasks</p>
+        </article>
+        <article class="rounded-2xl bg-aqua p-4">
+          <p class="text-[10px] font-extrabold uppercase tracking-wide text-plum">
+            Upcoming reminders
+          </p>
+          <p class="mt-1 text-2xl font-extrabold text-plum">
+            {{ snapshot.upcomingReminderCount }}
+          </p>
+          <p class="mt-1 truncate text-xs text-ls-text-muted">
+            {{ snapshot.upcomingReminders[0]?.title ?? 'Nothing upcoming' }}
+          </p>
+        </article>
+        <article class="rounded-2xl border border-ls-border bg-ls-surface p-4">
+          <p class="text-[10px] font-extrabold uppercase tracking-wide text-orchid">
+            Habit rhythm
+          </p>
+          @if (snapshot.activeHabits > 0) {
+            <p class="mt-1 text-2xl font-extrabold text-plum">
+              {{ snapshot.weeklyHabitConsistencyPercentage }}%
+            </p>
+            <p class="mt-1 text-xs text-ls-text-muted">
+              {{ snapshot.habitCompletionsThisWeek }} completions ·
+              {{ snapshot.activeHabits }} active
+            </p>
+          } @else {
+            <p class="mt-1 text-sm font-bold text-plum">No active habits</p>
+            <p class="mt-1 text-xs text-ls-text-muted">Add a habit to see weekly progress.</p>
+          }
+        </article>
+      </div>
+
+      <div class="mt-5 grid gap-4 lg:grid-cols-3">
+        <section class="rounded-2xl border border-ls-border bg-ls-surface p-4">
+          <div class="flex items-center justify-between gap-2">
+            <h3 class="font-extrabold text-plum">Coming up</h3>
+            <span class="text-xs font-medium text-ls-text-muted">Next 7 days</span>
+          </div>
+          @if (snapshot.upcomingDeadlines.length === 0) {
+            <p class="mt-3 rounded-xl bg-ls-surface px-3 py-4 text-sm text-ls-text-muted">
+              No upcoming task deadlines were returned.
+            </p>
+          } @else {
+            <ul class="mt-3 divide-y divide-ls-border">
+              @for (task of snapshot.upcomingDeadlines; track task.id) {
+                <li class="flex items-start justify-between gap-3 py-3 first:pt-0 last:pb-0">
+                  <div class="min-w-0">
+                    <p class="truncate text-sm font-bold text-plum">{{ task.title }}</p>
+                    <p class="mt-1 text-xs text-ls-text-muted">
+                      {{ task.priority }} priority · {{ task.status.replace('_', ' ') }}
+                    </p>
+                  </div>
+                  <time class="shrink-0 text-xs font-semibold text-orchid">
+                    {{ task.dueDate ? (task.dueDate | date: 'MMM d, h:mm a') : 'No due date' }}
+                  </time>
+                </li>
+              }
+            </ul>
+          }
+        </section>
+
+        <section class="rounded-2xl border border-ls-border bg-ls-surface p-4">
+          <h3 class="font-extrabold text-plum">On your calendar today</h3>
+          @if (snapshot.eventsToday.length === 0) {
+            <p class="mt-3 rounded-xl bg-ls-surface px-3 py-4 text-sm text-ls-text-muted">
+              No calendar events were returned for today.
+            </p>
+          } @else {
+            <ul class="mt-3 divide-y divide-ls-border">
+              @for (event of snapshot.eventsToday; track event.id) {
+                <li class="flex items-start justify-between gap-3 py-3 first:pt-0 last:pb-0">
+                  <div class="min-w-0">
+                    <p class="truncate text-sm font-bold text-plum">{{ event.title }}</p>
+                    <p class="mt-1 text-xs text-ls-text-muted">{{ event.eventType }}</p>
+                  </div>
+                  <time class="shrink-0 text-xs font-semibold text-orchid">
+                    {{ formatTime(event.startDateTime) }}–{{ formatTime(event.endDateTime) }}
+                  </time>
+                </li>
+              }
+            </ul>
+          }
+        </section>
+
+        <section class="rounded-2xl border border-ls-border bg-ls-surface p-4">
+          <h3 class="font-extrabold text-plum">Upcoming reminders</h3>
+          @if (snapshot.upcomingReminders.length === 0) {
+            <p class="mt-3 rounded-xl bg-ls-surface px-3 py-4 text-sm text-ls-text-muted">
+              No upcoming reminders were returned.
+            </p>
+          } @else {
+            <ul class="mt-3 divide-y divide-ls-border">
+              @for (reminder of snapshot.upcomingReminders; track reminder.id) {
+                <li class="flex items-start justify-between gap-3 py-3 first:pt-0 last:pb-0">
+                  <div class="min-w-0">
+                    <p class="truncate text-sm font-bold text-plum">{{ reminder.title }}</p>
+                    <p class="mt-1 text-xs text-ls-text-muted">{{ reminder.reminderType }}</p>
+                  </div>
+                  <time class="shrink-0 text-xs font-semibold text-orchid">
+                    {{ reminder.reminderDateTime | date: 'MMM d, h:mm a' }}
+                  </time>
+                </li>
+              }
+            </ul>
+          }
+        </section>
+      </div>
+    }
+  </section>
+
+  <section class="rounded-2xl border border-ls-border bg-powder-blue/60 px-4 py-3">
+    <p class="text-xs leading-5 text-plum">
+      Your chat conversation lasts for this open session only. Plan suggestions remain drafts;
+      review them in the planner before making any changes.
+    </p>
+  </section>
+</div>

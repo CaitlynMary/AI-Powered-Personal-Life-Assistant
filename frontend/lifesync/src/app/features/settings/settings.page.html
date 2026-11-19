@@ -1,0 +1,374 @@
+<div class="mx-auto flex max-w-7xl flex-col gap-5">
+  <section
+    class="ls-card ls-title-card flex flex-col gap-4 bg-ls-surface p-5 sm:flex-row sm:items-center sm:justify-between sm:p-7"
+  >
+    <div>
+      <p class="ls-title-eyebrow text-sm font-bold uppercase tracking-[0.14em]">Make LifeSync yours</p>
+      <h1 class="mt-1 text-3xl font-extrabold tracking-tight text-plum dark:text-cream sm:text-4xl">
+        {{ activeSection() ? sectionTitle(activeSection()) : 'Settings' }}
+      </h1>
+      <p class="mt-2 text-sm font-medium text-ls-text/70">
+        {{ activeSection() ? 'Manage this part of your LifeSync experience.' : 'Your profile, preferences and account controls.' }}
+      </p>
+    </div>
+    @if (activeSection()) {
+      <button
+        type="button"
+        class="inline-flex min-h-11 items-center gap-2 self-start rounded-xl border border-ls-border bg-ls-surface px-4 py-2 text-sm font-bold text-ls-text transition hover:bg-ls-surface-2 sm:self-center"
+        (click)="backToOverview()"
+      >
+        <svg lucideIcon="arrow-right" class="rotate-180" [size]="17"></svg>
+        Back to settings
+      </button>
+    }
+  </section>
+
+  @if (preferencesLoadError(); as message) {
+    <div class="flex flex-col gap-3 rounded-2xl border border-burgundy/20 bg-burgundy/5 px-4 py-3 text-sm text-ls-text sm:flex-row sm:items-center sm:justify-between" role="alert">
+      <span>{{ message }}</span>
+      <button
+        type="button"
+        class="min-h-10 rounded-xl border border-ls-border bg-ls-surface px-4 font-bold text-ls-text hover:bg-ls-surface-2"
+        (click)="retryPreferenceLoad()"
+      >
+        Try again
+      </button>
+    </div>
+  }
+
+  @if (!activeSection()) {
+    <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3" aria-label="Settings sections">
+      @for (card of sectionCards; track card.id) {
+        <button
+          type="button"
+          class="ls-card flex min-h-36 items-start gap-4 bg-ls-surface p-5 text-left transition hover:-translate-y-0.5 hover:border-navy/20 hover:shadow-card focus-visible:ring-2 focus-visible:ring-navy"
+          (click)="openSection(card.id)"
+        >
+          <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl" [class]="card.accent">
+            <svg [lucideIcon]="card.icon" [size]="23"></svg>
+          </span>
+          <span class="min-w-0">
+            <span class="block text-base font-extrabold text-ls-text">{{ card.title }}</span>
+            <span class="mt-1 block text-sm leading-6 text-ls-text-muted">{{ card.description }}</span>
+          </span>
+        </button>
+      }
+    </section>
+  } @else {
+    <section class="ls-card bg-ls-surface p-5 sm:p-7">
+      @switch (activeSection()) {
+        @case ('profile') {
+          <div class="mb-6 flex items-center gap-4">
+            <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-powder-blue text-xl font-extrabold text-plum" aria-label="Profile initials">
+              {{ profileInitials() }}
+            </div>
+            <div class="min-w-0">
+              <h2 class="text-xl font-extrabold text-ls-text">My Profile</h2>
+              <p class="mt-1 text-sm text-ls-text-muted">Your profile details are linked to your signed-in account.</p>
+            </div>
+          </div>
+
+          <form class="max-w-2xl space-y-5" [formGroup]="profileForm" (ngSubmit)="saveProfile()">
+            <label class="block">
+              <span class="mb-1.5 block text-sm font-bold text-ls-text">Full name</span>
+              <input
+                type="text"
+                formControlName="fullName"
+                autocomplete="name"
+                maxlength="100"
+                class="h-11 w-full rounded-xl border px-3 text-sm focus:border-navy"
+              />
+              @if (profileForm.controls.fullName.touched && profileForm.controls.fullName.hasError('required')) {
+                <span class="mt-1 block text-xs font-semibold text-burgundy" role="alert">Your name is required.</span>
+              }
+              @if (profileForm.controls.fullName.touched && profileForm.controls.fullName.hasError('pattern')) {
+                <span class="mt-1 block text-xs font-semibold text-burgundy" role="alert">Your name cannot be blank.</span>
+              }
+              @if (profileForm.controls.fullName.touched && profileForm.controls.fullName.hasError('maxlength')) {
+                <span class="mt-1 block text-xs font-semibold text-burgundy" role="alert">Your name must be 100 characters or fewer.</span>
+              }
+            </label>
+
+            <label class="block">
+              <span class="mb-1.5 block text-sm font-bold text-ls-text">Email address</span>
+              <input
+                type="email"
+                [value]="profile()?.email ?? ''"
+                readonly
+                autocomplete="email"
+                class="h-11 w-full cursor-not-allowed rounded-xl border px-3 text-sm opacity-75"
+              />
+              <span class="mt-1 block text-xs text-ls-text-muted">Email changes are not supported by the current account API.</span>
+            </label>
+
+            <label class="block">
+              <span class="mb-1.5 block text-sm font-bold text-ls-text">Phone number <span class="font-medium text-ls-text-muted">(optional)</span></span>
+              <input
+                type="tel"
+                formControlName="phoneNumber"
+                autocomplete="tel"
+                inputmode="tel"
+                class="h-11 w-full rounded-xl border px-3 text-sm focus:border-navy"
+                placeholder="+15555555555"
+              />
+              @if (profileForm.controls.phoneNumber.touched && profileForm.controls.phoneNumber.invalid) {
+                <span class="mt-1 block text-xs font-semibold text-burgundy" role="alert">Enter a phone number with 7–15 digits, optionally starting with +.</span>
+              }
+            </label>
+
+            @if (profileSuccess(); as message) {
+              <p class="rounded-xl bg-aqua/30 px-3 py-2 text-sm font-semibold text-ls-text" role="status">{{ message }}</p>
+            }
+            @if (profileError(); as message) {
+              <p class="rounded-xl bg-burgundy/5 px-3 py-2 text-sm font-semibold text-burgundy" role="alert">{{ message }}</p>
+            }
+
+            <div class="flex flex-wrap gap-3 pt-1">
+              <button type="submit" [disabled]="profileSaving()" class="min-h-11 rounded-xl bg-lime px-5 py-2 text-sm font-extrabold text-plum transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60">
+                {{ profileSaving() ? 'Saving…' : 'Save profile' }}
+              </button>
+              <button type="button" class="min-h-11 rounded-xl border border-ls-border px-5 py-2 text-sm font-bold text-ls-text hover:bg-ls-surface-2" (click)="cancelProfileEdit()">
+                Cancel
+              </button>
+            </div>
+          </form>
+        }
+
+        @case ('appearance') {
+          <div class="max-w-3xl">
+            <h2 class="text-xl font-extrabold text-ls-text">Appearance</h2>
+            <p class="mt-1 text-sm leading-6 text-ls-text-muted">Choose how LifeSync looks on this device. Your choice is saved automatically and stays in effect across pages.</p>
+            <div class="mt-5 grid gap-4 sm:grid-cols-2">
+              <label class="flex cursor-pointer items-start gap-3 rounded-2xl border border-ls-border bg-ls-surface p-4 transition hover:border-navy/30">
+                <input type="radio" name="theme" value="light" [checked]="theme.mode() === 'light'" (change)="setTheme('light')" class="mt-1" />
+                <span>
+                  <span class="block font-extrabold text-ls-text">Light mode</span>
+                  <span class="mt-1 block text-sm leading-5 text-ls-text-muted">A bright workspace with the existing LifeSync pastel palette.</span>
+                </span>
+              </label>
+              <label class="flex cursor-pointer items-start gap-3 rounded-2xl border border-ls-border bg-ls-surface p-4 transition hover:border-navy/30">
+                <input type="radio" name="theme" value="dark" [checked]="theme.mode() === 'dark'" (change)="setTheme('dark')" class="mt-1" />
+                <span>
+                  <span class="block font-extrabold text-ls-text">Dark mode</span>
+                  <span class="mt-1 block text-sm leading-5 text-ls-text-muted">A darker interface for comfortable viewing in low light.</span>
+                </span>
+              </label>
+            </div>
+            <p class="mt-4 text-xs text-ls-text-muted">Theme preference is stored in this browser by the existing theme service.</p>
+          </div>
+        }
+
+        @case ('notifications') {
+          <div class="max-w-3xl">
+            <h2 class="text-xl font-extrabold text-ls-text">In-app notifications</h2>
+            <p class="mt-1 text-sm leading-6 text-ls-text-muted">Choose which LifeSync updates can be added to your in-app notification list. Existing notifications are not deleted.</p>
+            <form class="mt-5 space-y-3" [formGroup]="preferencesForm" (ngSubmit)="savePreferences()">
+              <label class="flex cursor-pointer items-start justify-between gap-4 rounded-2xl border border-ls-border p-4">
+                <span><span class="block font-bold text-ls-text">Task reminders and updates</span><span class="mt-1 block text-sm text-ls-text-muted">Due-soon, overdue, completed, missed, rescheduled and reminder events.</span></span>
+                <input type="checkbox" formControlName="taskRemindersEnabled" class="mt-1 h-5 w-5 shrink-0" />
+              </label>
+              <label class="flex cursor-pointer items-start justify-between gap-4 rounded-2xl border border-ls-border p-4">
+                <span><span class="block font-bold text-ls-text">Goal and milestone updates</span><span class="mt-1 block text-sm text-ls-text-muted">Milestone completion updates.</span></span>
+                <input type="checkbox" formControlName="goalMilestoneUpdatesEnabled" class="mt-1 h-5 w-5 shrink-0" />
+              </label>
+              <label class="flex cursor-pointer items-start justify-between gap-4 rounded-2xl border border-ls-border p-4">
+                <span><span class="block font-bold text-ls-text">Habit completion updates</span><span class="mt-1 block text-sm text-ls-text-muted">Habit completion notifications currently supported by LifeSync.</span></span>
+                <input type="checkbox" formControlName="habitRemindersEnabled" class="mt-1 h-5 w-5 shrink-0" />
+              </label>
+              <label class="flex cursor-pointer items-start justify-between gap-4 rounded-2xl border border-ls-border p-4">
+                <span><span class="block font-bold text-ls-text">AI planner updates</span><span class="mt-1 block text-sm text-ls-text-muted">An in-app update when AI daily plan suggestions are ready.</span></span>
+                <input type="checkbox" formControlName="aiPlannerUpdatesEnabled" class="mt-1 h-5 w-5 shrink-0" />
+              </label>
+
+              <p class="pt-1 text-xs leading-5 text-ls-text-muted">Email, SMS and browser push notifications are not currently supported, so they are not offered here.</p>
+              @if (preferencesSuccess(); as message) {
+                <p class="rounded-xl bg-aqua/30 px-3 py-2 text-sm font-semibold text-ls-text" role="status">{{ message }}</p>
+              }
+              @if (preferencesError(); as message) {
+                <p class="rounded-xl bg-burgundy/5 px-3 py-2 text-sm font-semibold text-burgundy" role="alert">{{ message }}</p>
+              }
+              <div class="flex flex-wrap gap-3 pt-2">
+                <button type="submit" [disabled]="preferencesSaving() || preferencesLoading() || preferencesLoadError()" class="min-h-11 rounded-xl bg-lime px-5 py-2 text-sm font-extrabold text-plum hover:brightness-95 disabled:opacity-60">{{ preferencesSaving() ? 'Saving…' : 'Save preferences' }}</button>
+                <button type="button" class="min-h-11 rounded-xl border border-ls-border px-5 py-2 text-sm font-bold text-ls-text hover:bg-ls-surface-2" (click)="cancelPreferenceChanges()">Cancel</button>
+              </div>
+            </form>
+          </div>
+        }
+
+        @case ('regional') {
+          <div class="max-w-3xl">
+            <h2 class="text-xl font-extrabold text-ls-text">Regional settings</h2>
+            <p class="mt-1 text-sm leading-6 text-ls-text-muted">These preferences are saved to your account and used by date and calendar views.</p>
+            <form class="mt-5 grid gap-5 sm:grid-cols-2" [formGroup]="preferencesForm" (ngSubmit)="savePreferences()">
+              <label class="block">
+                <span class="mb-1.5 block text-sm font-bold text-ls-text">Time zone</span>
+                <select formControlName="timeZoneId" class="h-11 w-full rounded-xl border px-3 text-sm">
+                  @for (zone of timeZones; track zone.value) {
+                    <option [value]="zone.value">{{ zone.label }}</option>
+                  }
+                </select>
+              </label>
+              <label class="block">
+                <span class="mb-1.5 block text-sm font-bold text-ls-text">Date format</span>
+                <select formControlName="dateFormat" class="h-11 w-full rounded-xl border px-3 text-sm">
+                  @for (format of dateFormats; track format.value) {
+                    <option [value]="format.value">{{ format.label }}</option>
+                  }
+                </select>
+              </label>
+              <label class="block">
+                <span class="mb-1.5 block text-sm font-bold text-ls-text">Time format</span>
+                <select formControlName="timeFormat" class="h-11 w-full rounded-xl border px-3 text-sm">
+                  @for (format of timeFormats; track format.value) {
+                    <option [value]="format.value">{{ format.label }}</option>
+                  }
+                </select>
+              </label>
+              <label class="block">
+                <span class="mb-1.5 block text-sm font-bold text-ls-text">Week starts on</span>
+                <select formControlName="weekStart" class="h-11 w-full rounded-xl border px-3 text-sm">
+                  <option value="SUNDAY">Sunday</option>
+                  <option value="MONDAY">Monday</option>
+                </select>
+              </label>
+              @if (preferencesSuccess(); as message) {
+                <p class="rounded-xl bg-aqua/30 px-3 py-2 text-sm font-semibold text-ls-text sm:col-span-2" role="status">{{ message }}</p>
+              }
+              @if (preferencesError(); as message) {
+                <p class="rounded-xl bg-burgundy/5 px-3 py-2 text-sm font-semibold text-burgundy sm:col-span-2" role="alert">{{ message }}</p>
+              }
+              <div class="flex flex-wrap gap-3 pt-1 sm:col-span-2">
+                <button type="submit" [disabled]="preferencesSaving() || preferencesLoading() || preferencesLoadError()" class="min-h-11 rounded-xl bg-lime px-5 py-2 text-sm font-extrabold text-plum hover:brightness-95 disabled:opacity-60">{{ preferencesSaving() ? 'Saving…' : 'Save regional settings' }}</button>
+                <button type="button" class="min-h-11 rounded-xl border border-ls-border px-5 py-2 text-sm font-bold text-ls-text hover:bg-ls-surface-2" (click)="cancelPreferenceChanges()">Cancel</button>
+              </div>
+            </form>
+          </div>
+        }
+
+        @case ('security') {
+          <div class="grid gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(16rem,0.7fr)]">
+            <div>
+              <h2 class="text-xl font-extrabold text-ls-text">Change password</h2>
+              <p class="mt-1 text-sm leading-6 text-ls-text-muted">Use your current password to set a new one for this account.</p>
+              <form class="mt-5 max-w-xl space-y-4" [formGroup]="passwordForm" (ngSubmit)="changePassword()">
+                <label class="block">
+                  <span class="mb-1.5 block text-sm font-bold text-ls-text">Current password</span>
+                  <input type="password" formControlName="currentPassword" autocomplete="current-password" class="h-11 w-full rounded-xl border px-3 text-sm" />
+                  @if (passwordForm.controls.currentPassword.touched && passwordForm.controls.currentPassword.hasError('required')) {
+                    <span class="mt-1 block text-xs font-semibold text-burgundy" role="alert">Enter your current password.</span>
+                  }
+                </label>
+                <label class="block">
+                  <span class="mb-1.5 block text-sm font-bold text-ls-text">New password</span>
+                  <input type="password" formControlName="newPassword" autocomplete="new-password" class="h-11 w-full rounded-xl border px-3 text-sm" />
+                  @if (passwordForm.controls.newPassword.touched && passwordForm.controls.newPassword.hasError('required')) {
+                    <span class="mt-1 block text-xs font-semibold text-burgundy" role="alert">Enter a new password.</span>
+                  }
+                  @if (passwordForm.controls.newPassword.touched && passwordForm.controls.newPassword.hasError('minlength')) {
+                    <span class="mt-1 block text-xs font-semibold text-burgundy" role="alert">Use at least 8 characters.</span>
+                  }
+                  @if (passwordForm.controls.newPassword.touched && passwordForm.controls.newPassword.hasError('maxlength')) {
+                    <span class="mt-1 block text-xs font-semibold text-burgundy" role="alert">Use 100 characters or fewer.</span>
+                  }
+                </label>
+                <label class="block">
+                  <span class="mb-1.5 block text-sm font-bold text-ls-text">Confirm new password</span>
+                  <input type="password" formControlName="confirmPassword" autocomplete="new-password" class="h-11 w-full rounded-xl border px-3 text-sm" />
+                  @if (passwordForm.controls.confirmPassword.touched && (passwordForm.controls.confirmPassword.hasError('required') || passwordConfirmationMismatch())) {
+                    <span class="mt-1 block text-xs font-semibold text-burgundy" role="alert">Enter the same new password again.</span>
+                  }
+                </label>
+                @if (passwordSuccess(); as message) {
+                  <p class="rounded-xl bg-aqua/30 px-3 py-2 text-sm font-semibold text-ls-text" role="status">{{ message }}</p>
+                }
+                @if (passwordError(); as message) {
+                  <p class="rounded-xl bg-burgundy/5 px-3 py-2 text-sm font-semibold text-burgundy" role="alert">{{ message }}</p>
+                }
+                <button type="submit" [disabled]="passwordSaving()" class="min-h-11 rounded-xl bg-lime px-5 py-2 text-sm font-extrabold text-plum hover:brightness-95 disabled:opacity-60">{{ passwordSaving() ? 'Updating…' : 'Change password' }}</button>
+              </form>
+            </div>
+
+            <aside class="rounded-2xl border border-ls-border bg-ls-surface-2 p-5">
+              <h3 class="font-extrabold text-ls-text">Account security</h3>
+              <p class="mt-2 text-sm leading-6 text-ls-text-muted">Password changes use LifeSync’s authenticated account endpoint. Your password is never displayed or stored in these settings.</p>
+              <div class="mt-6 border-t border-ls-border pt-5">
+                <h3 class="font-extrabold text-ls-text">Sign out</h3>
+                <p class="mt-2 text-sm leading-6 text-ls-text-muted">End the current session on this device.</p>
+                @if (logoutError(); as message) {
+                  <p class="mt-3 text-sm font-semibold text-burgundy" role="alert">{{ message }}</p>
+                }
+                <button type="button" [disabled]="loggingOut()" class="mt-4 min-h-11 rounded-xl border border-burgundy/20 px-4 py-2 text-sm font-bold text-burgundy hover:bg-burgundy/5 disabled:opacity-60" (click)="logout()">
+                  {{ loggingOut() ? 'Signing out…' : 'Log out' }}
+                </button>
+              </div>
+            </aside>
+          </div>
+        }
+
+        @case ('ai') {
+          <div class="max-w-3xl">
+            <h2 class="text-xl font-extrabold text-ls-text">AI preferences</h2>
+            <p class="mt-1 text-sm leading-6 text-ls-text-muted">Choose the response style used by LifeSync AI chat and decide whether it can use your LifeSync records for contextual chat suggestions.</p>
+            <form class="mt-5 space-y-5" [formGroup]="preferencesForm" (ngSubmit)="savePreferences()">
+              <fieldset>
+                <legend class="mb-2 text-sm font-bold text-ls-text">Preferred response style</legend>
+                <div class="grid gap-3 sm:grid-cols-3">
+                  @for (style of aiResponseStyles; track style.value) {
+                    <label class="flex cursor-pointer items-start gap-3 rounded-2xl border border-ls-border p-4 hover:border-navy/30">
+                      <input type="radio" formControlName="aiResponseStyle" [value]="style.value" class="mt-1" />
+                      <span><span class="block font-extrabold text-ls-text">{{ style.label }}</span><span class="mt-1 block text-xs leading-5 text-ls-text-muted">{{ style.description }}</span></span>
+                    </label>
+                  }
+                </div>
+              </fieldset>
+
+              <label class="flex cursor-pointer items-start gap-3 rounded-2xl border border-ls-border bg-powder-blue/15 p-4">
+                <input type="checkbox" formControlName="aiPersonalizationEnabled" class="mt-1 h-5 w-5 shrink-0" />
+                <span>
+                  <span class="block font-bold text-ls-text">Use my LifeSync records for contextual chat suggestions</span>
+                  <span class="mt-1 block text-sm leading-6 text-ls-text-muted">When enabled, AI chat may use relevant tasks, goals, habits, reminders and schedules associated with your account. When disabled, those records are not sent as chat context.</span>
+                </span>
+              </label>
+
+              <p class="rounded-xl bg-ls-surface-2 px-4 py-3 text-sm leading-6 text-ls-text-muted">AI Planner uses the tasks and schedule details you select to create a plan. That planning workflow is separate from the AI Assistant chat context preference above.</p>
+              @if (preferencesSuccess(); as message) {
+                <p class="rounded-xl bg-aqua/30 px-3 py-2 text-sm font-semibold text-ls-text" role="status">{{ message }}</p>
+              }
+              @if (preferencesError(); as message) {
+                <p class="rounded-xl bg-burgundy/5 px-3 py-2 text-sm font-semibold text-burgundy" role="alert">{{ message }}</p>
+              }
+              <div class="flex flex-wrap gap-3 pt-1">
+                <button type="submit" [disabled]="preferencesSaving() || preferencesLoading() || preferencesLoadError()" class="min-h-11 rounded-xl bg-lime px-5 py-2 text-sm font-extrabold text-plum hover:brightness-95 disabled:opacity-60">{{ preferencesSaving() ? 'Saving…' : 'Save AI preferences' }}</button>
+                <button type="button" class="min-h-11 rounded-xl border border-ls-border px-5 py-2 text-sm font-bold text-ls-text hover:bg-ls-surface-2" (click)="cancelPreferenceChanges()">Cancel</button>
+              </div>
+            </form>
+          </div>
+        }
+
+        @case ('about') {
+          <div class="max-w-3xl">
+            <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-aqua/40 text-plum">
+              <svg lucideIcon="sparkles" [size]="26"></svg>
+            </div>
+            <h2 class="mt-4 text-xl font-extrabold text-ls-text">About LifeSync</h2>
+            <p class="mt-2 text-sm leading-6 text-ls-text-muted">LifeSync is a personal productivity workspace for coordinating tasks, goals, habits, notes, schedules and reminders.</p>
+            <dl class="mt-6 grid gap-4 sm:grid-cols-2">
+              <div class="rounded-2xl border border-ls-border bg-ls-surface-2 p-4">
+                <dt class="text-xs font-bold uppercase tracking-wide text-ls-text-muted">Application</dt>
+                <dd class="mt-1 font-extrabold text-ls-text">LifeSync</dd>
+              </div>
+              <div class="rounded-2xl border border-ls-border bg-ls-surface-2 p-4">
+                <dt class="text-xs font-bold uppercase tracking-wide text-ls-text-muted">Version</dt>
+                <dd class="mt-1 font-extrabold text-ls-text">{{ appVersion }}</dd>
+              </div>
+              <div class="rounded-2xl border border-ls-border bg-ls-surface-2 p-4 sm:col-span-2">
+                <dt class="text-xs font-bold uppercase tracking-wide text-ls-text-muted">Technology</dt>
+                <dd class="mt-1 font-semibold leading-6 text-ls-text">Angular, Tailwind CSS and Lucide on the frontend; Spring Boot and PostgreSQL on the backend.</dd>
+              </div>
+            </dl>
+          </div>
+        }
+      }
+    </section>
+  }
+</div>

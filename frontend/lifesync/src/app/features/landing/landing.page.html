@@ -1,0 +1,290 @@
+<main class="landing-page" id="home">
+  <div class="landing-glow landing-glow--left" aria-hidden="true"></div>
+  <div class="landing-glow landing-glow--right" aria-hidden="true"></div>
+  <div class="landing-leaf-decoration" aria-hidden="true">
+    <app-quote-leaf />
+  </div>
+
+  <header class="landing-header">
+    <a class="brand" routerLink="/" fragment="home" aria-label="LifeSync home">
+      <app-lifesync-logo [size]="46" />
+      <span>LifeSync</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="Main navigation">
+      <a class="nav-link" href="#home" aria-current="page">Home</a>
+      <a class="nav-link" href="#features">Features</a>
+      <a class="nav-link" href="#about">About</a>
+    </nav>
+
+    <div class="header-actions">
+      <button
+        class="landing-theme-toggle"
+        type="button"
+        [attr.aria-label]="mode() === 'light' ? 'Switch to dark theme' : 'Switch to light theme'"
+        [attr.aria-pressed]="mode() === 'dark'"
+        [attr.title]="mode() === 'light' ? 'Switch to dark theme' : 'Switch to light theme'"
+        (click)="toggleTheme()"
+      >
+        @if (mode() === 'light') {
+          <svg class="theme-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="4" />
+            <path
+              d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"
+            />
+          </svg>
+        } @else {
+          <svg class="theme-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M20.9 13.1A8.5 8.5 0 0 1 10.9 3.1 8.5 8.5 0 1 0 20.9 13.1Z" />
+          </svg>
+        }
+      </button>
+      <a class="button button--outline button--small" routerLink="/login">Log In</a>
+      <a class="button button--lime button--small" routerLink="/register">Sign Up</a>
+    </div>
+  </header>
+
+  <section class="hero-section" aria-labelledby="hero-title">
+    <div class="hero-copy">
+      <p class="eyebrow"><span class="eyebrow-dot"></span> Your little corner for a fuller life</p>
+      <h1 id="hero-title">
+        Plan Focus Grow<br />
+        with <span class="brand-emphasis">LifeSync</span>
+      </h1>
+      <p class="hero-subtitle">Your AI-Powered Personal Life Assistant</p>
+      <p class="hero-description">
+        Manage your tasks, goals, habits and time in one place. Stay organised, build better
+        routines and create a more balanced, productive life.
+      </p>
+      <div class="hero-actions">
+        <a class="button button--lime button--hero" routerLink="/register">
+          Get Started
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13m-5-5 5 5-5 5" /></svg>
+        </a>
+        <a class="button button--video button--hero" href="#how-it-works">
+          <svg viewBox="0 0 24 24" aria-hidden="true" class="play-icon">
+            <path
+              d="M8 5.8c0-.8.9-1.3 1.6-.9l9.1 5.2a1.1 1.1 0 0 1 0 1.9l-9.1 5.2c-.7.4-1.6-.1-1.6-.9z"
+            />
+          </svg>
+          See How It Works
+        </a>
+      </div>
+
+      <div class="hero-highlights" aria-label="LifeSync benefits">
+        <div class="highlight">
+          <svg viewBox="0 0 32 32" aria-hidden="true">
+            <path d="M18 2 7 17h8l-1 13 11-17h-8z" />
+          </svg>
+          <span>Be Productive</span>
+        </div>
+        <span class="highlight-divider" aria-hidden="true"></span>
+        <div class="highlight">
+          <svg viewBox="0 0 32 32" aria-hidden="true">
+            <path d="M16 5v21M5 9h22M8 9l-5 9h10zm16 0-5 9h10zM11 27h10" />
+          </svg>
+          <span>Stay Balanced</span>
+        </div>
+        <span class="highlight-divider" aria-hidden="true"></span>
+        <div class="highlight">
+          <svg viewBox="0 0 32 32" aria-hidden="true">
+            <path
+              d="M16 28V15m0 4c-8 0-11-5-11-13 8 0 12 3 12 10m0 0c0-7 4-11 11-11 0 8-3 13-11 13"
+            />
+          </svg>
+          <span>Grow Consistently</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-art">
+      <img
+        class="hero-illustration"
+        [src]="
+          mode() === 'dark'
+            ? '/images/lifesync-landing-illustration-dark.png'
+            : '/images/lifesync-landing-illustration.png'
+        "
+        alt="A spiral notebook with a checklist beside a green plant, books and a steaming coffee cup at sunset."
+        width="980"
+        height="768"
+        fetchpriority="high"
+      />
+      <div class="floating-features" role="list" aria-label="LifeSync feature highlights">
+        <div class="floating-feature floating-feature--tasks" role="listitem">
+          <svg viewBox="0 0 40 40" aria-hidden="true">
+            <rect x="7" y="5" width="26" height="30" rx="5" />
+            <path d="m12 14 4 4 8-9m-12 15 4 4 9-10" />
+          </svg>
+          <span>Tasks</span>
+        </div>
+        <div class="floating-feature floating-feature--goals" role="listitem">
+          <svg viewBox="0 0 40 40" aria-hidden="true">
+            <circle cx="18" cy="22" r="13" />
+            <circle cx="18" cy="22" r="7" />
+            <circle cx="18" cy="22" r="2" />
+            <path d="m20 20 13-13m-7 0h7v7" />
+          </svg>
+          <span>Goals</span>
+        </div>
+        <div class="floating-feature floating-feature--habits" role="listitem">
+          <svg viewBox="0 0 40 40" aria-hidden="true">
+            <path
+              d="M20 34V19m0 7c-9 0-13-6-13-15 9 0 14 4 14 12m-1 0c0-9 5-14 14-14 0 9-4 15-14 15"
+            />
+          </svg>
+          <span>Habits</span>
+        </div>
+        <div class="floating-feature floating-feature--calendar" role="listitem">
+          <svg viewBox="0 0 40 40" aria-hidden="true">
+            <rect x="6" y="9" width="28" height="25" rx="5" />
+            <path d="M13 5v8m14-8v8M6 17h28m-20 6h.1m6.9 0h.1m6.9 0h.1m-14 6h.1m6.9 0h.1" />
+          </svg>
+          <span>Calendar</span>
+        </div>
+        <div class="floating-feature floating-feature--assistant" role="listitem">
+          <svg viewBox="0 0 40 40" aria-hidden="true">
+            <rect x="8" y="11" width="24" height="19" rx="7" />
+            <path d="M20 5v6M4 19h4m24 0h4M14 30l-3 5m15-5 3 5" />
+            <circle cx="15" cy="19" r="1.5" />
+            <circle cx="25" cy="19" r="1.5" />
+            <path d="M15 25h10" />
+          </svg>
+          <span>AI Assistant</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="how-section" id="how-it-works" aria-labelledby="how-title">
+    <div class="section-kicker">A little more in sync</div>
+    <h2 id="how-title">One calm place to make progress.</h2>
+    <p>
+      Gather your to-dos, goals and routines, then give your day a plan that feels right for you.
+      LifeSync keeps your notes, reminders and calendar close by as you go.
+    </p>
+    <a class="text-link" routerLink="/register"
+      >Make space for what matters <span aria-hidden="true">→</span></a
+    >
+  </section>
+
+  <section class="features-section" id="features" aria-labelledby="features-title">
+    <div class="section-heading">
+      <div>
+        <div class="section-kicker">Little tools, one bigger picture</div>
+        <h2 id="features-title">
+          Everything you need to find<br class="feature-title-break" />
+          your rhythm.
+        </h2>
+      </div>
+      <p>
+        Thoughtful tools for the everyday things you want<br class="feature-copy-break" />
+        to do, remember and become.
+      </p>
+    </div>
+    <div class="feature-grid">
+      @for (feature of features; track feature.title) {
+        <article class="feature-card" [class]="'feature-card feature-card--' + feature.tone">
+          <span class="feature-icon" aria-hidden="true">
+            @switch (feature.icon) {
+              @case ('check-square') {
+                <svg viewBox="0 0 32 32">
+                  <rect x="5" y="5" width="22" height="22" rx="5" />
+                  <path d="m10 15 4 4 8-9" />
+                </svg>
+              }
+              @case ('target') {
+                <svg viewBox="0 0 32 32">
+                  <circle cx="15" cy="17" r="11" />
+                  <circle cx="15" cy="17" r="6" />
+                  <circle cx="15" cy="17" r="1.5" />
+                  <path d="m17 15 10-10m-6 0h6v6" />
+                </svg>
+              }
+              @case ('sprout') {
+                <svg viewBox="0 0 32 32">
+                  <path
+                    d="M16 28V15m0 4C8 19 5 14 5 7c8 0 12 3 12 10m-1 1c0-7 4-11 11-11 0 8-3 13-11 13"
+                  />
+                </svg>
+              }
+              @case ('calendar-days') {
+                <svg viewBox="0 0 32 32">
+                  <rect x="4" y="7" width="24" height="21" rx="4" />
+                  <path d="M10 4v6m12-6v6M4 13h24m-17 5h.1m5.9 0h.1m5.9 0h.1m-12 5h.1m5.9 0h.1" />
+                </svg>
+              }
+              @case ('list-checks') {
+                <svg viewBox="0 0 32 32">
+                  <path d="m5 8 2 2 4-4m3 3h13M5 17l2 2 4-4m3 3h13M5 26l2 2 4-4m3 3h13" />
+                </svg>
+              }
+              @case ('notebook-pen') {
+                <svg viewBox="0 0 32 32">
+                  <path
+                    d="M8 5h18v23H8a3 3 0 0 1-3-3V8a3 3 0 0 1 3-3Zm-3 6h4m-4 7h4m-4 7h4m6-13h8m-8 5h6"
+                  />
+                  <path d="m20 22 6-6 3 3-6 6-4 1z" />
+                </svg>
+              }
+              @case ('bell') {
+                <svg viewBox="0 0 32 32">
+                  <path d="M24 12a8 8 0 0 0-16 0c0 10-4 10-4 13h24c0-3-4-3-4-13Zm-11 17h6" />
+                </svg>
+              }
+              @case ('bot') {
+                <svg viewBox="0 0 32 32">
+                  <rect x="5" y="10" width="22" height="17" rx="6" />
+                  <path d="M16 4v6m-5 8v.1m10-.1v.1M12 23h8M2 16h3m22 0h3" />
+                  <circle cx="16" cy="4" r="2" />
+                </svg>
+              }
+            }
+          </span>
+          <h3>{{ feature.title }}</h3>
+          <p>{{ feature.description }}</p>
+        </article>
+      }
+    </div>
+  </section>
+
+  <section class="about-section" id="about" aria-labelledby="about-title">
+    <div class="about-mark" aria-hidden="true">
+      <app-lifesync-logo [size]="68" />
+    </div>
+    <div>
+      <div class="section-kicker">A gentler way to get things done</div>
+      <h2 id="about-title">Progress that makes room for real life.</h2>
+      <p>
+        LifeSync brings your plans and personal growth into one welcoming space—so you can stay
+        focused on your goals, care for your routines, and make time for what matters most.
+      </p>
+    </div>
+  </section>
+
+  <section class="contact-section" id="contact" aria-labelledby="contact-title">
+    <div>
+      <div class="section-kicker">Your next chapter starts small</div>
+      <h2 id="contact-title">Ready to feel a little more in sync?</h2>
+      <p>Create your LifeSync account, or sign in to pick up where you left off.</p>
+    </div>
+    <div class="contact-actions">
+      <a class="button button--lime" routerLink="/register"
+        >Get Started <span aria-hidden="true">→</span></a
+      >
+      <a class="button button--outline" routerLink="/login">Log In</a>
+    </div>
+  </section>
+
+  <footer class="landing-footer">
+    <div class="landing-footer__top">
+      <a class="brand brand--footer" routerLink="/" fragment="home">
+        <app-lifesync-logo [size]="34" />
+        <span>LifeSync</span>
+      </a>
+      <span class="landing-footer__tagline">Plan a little. Grow a lot.</span>
+      <a href="#home">Back to top ↑</a>
+    </div>
+    <p class="landing-copyright">© 2026 LifeSync. All rights reserved.</p>
+  </footer>
+</main>

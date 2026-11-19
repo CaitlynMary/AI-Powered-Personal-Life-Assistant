@@ -1,0 +1,569 @@
+<div class="mx-auto flex max-w-7xl flex-col gap-5">
+  <section
+    class="ls-card ls-title-card ls-title-card--mint-blue flex flex-col gap-4 bg-ls-surface p-5 sm:flex-row sm:items-center sm:justify-between sm:p-7"
+  >
+    <div>
+      <p class="ls-title-eyebrow text-sm font-bold uppercase tracking-[0.14em]">
+        Small steps, real momentum
+      </p>
+      <h1 class="mt-1 text-3xl font-extrabold tracking-tight text-plum dark:text-cream sm:text-4xl">Your Habits</h1>
+      <p class="mt-2 text-sm font-medium text-ls-text/70">Build consistency one day at a time.</p>
+    </div>
+    <button
+      type="button"
+      class="rounded-2xl bg-lime px-5 py-3 text-sm font-extrabold text-plum shadow-soft transition hover:bg-mint"
+      (click)="beginCreate()"
+    >
+      + Create habit
+    </button>
+  </section>
+
+  @if (success(); as message) {
+    <div
+      class="flex items-center justify-between gap-3 rounded-2xl bg-mint/35 px-4 py-3 text-sm font-semibold text-ls-text"
+      role="status"
+    >
+      <span>{{ message }}</span>
+      <button
+        type="button"
+        class="rounded-lg px-2 py-1 font-bold"
+        aria-label="Dismiss message"
+        (click)="clearSuccess()"
+      >
+        ×
+      </button>
+    </div>
+  }
+  @if (actionError(); as message) {
+    <p class="rounded-2xl bg-ls-surface-2 px-4 py-3 text-sm font-semibold text-ls-text" role="alert">
+      {{ message }}
+    </p>
+  }
+
+  @if (loading() && !statistics()) {
+    <div
+      class="ls-card bg-ls-surface px-4 py-12 text-center text-sm font-semibold text-ls-text-muted"
+      role="status"
+    >
+      Loading your habits…
+    </div>
+  } @else if (error()) {
+    <div
+      class="ls-card flex flex-col items-start justify-between gap-3 bg-ls-surface-2 px-4 py-4 text-sm font-semibold text-ls-text sm:flex-row sm:items-center"
+      role="alert"
+    >
+      <span>{{ error() }}</span>
+      <button
+        type="button"
+        class="rounded-xl bg-plum px-4 py-2 font-bold text-cream"
+        (click)="loadHabits()"
+      >
+        Retry
+      </button>
+    </div>
+  } @else {
+    @if (statistics(); as stats) {
+      <section class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4" aria-label="Habit statistics">
+        <article class="ls-card bg-[var(--ls-stat-habits)] p-4">
+          <p class="text-xs font-extrabold uppercase tracking-wide text-ls-text-muted">
+            Active habits
+          </p>
+          <p class="mt-2 text-3xl font-extrabold text-ls-text">
+            {{ stats.activeHabits
+            }}<span class="ml-1 text-base font-semibold text-ls-text-muted"
+              >/ {{ stats.totalHabits }}</span
+            >
+          </p>
+        </article>
+        <article class="ls-card bg-[var(--ls-card-habits)] p-4">
+          <p class="text-xs font-extrabold uppercase tracking-wide text-ls-text-muted">
+            Completed days
+          </p>
+          <p class="mt-2 text-3xl font-extrabold text-ls-text">{{ stats.totalCompletedDays }}</p>
+        </article>
+        <article class="ls-card bg-[var(--ls-card-goals)] p-4">
+          <p class="text-xs font-extrabold uppercase tracking-wide text-ls-text-muted">This week</p>
+          <p class="mt-2 text-3xl font-extrabold text-ls-text">
+            {{ stats.weeklyConsistencyPercentage }}%
+          </p>
+          <p class="mt-1 text-xs font-medium text-ls-text-muted">
+            {{ stats.completionsThisWeek }} completed days
+          </p>
+        </article>
+        <article class="ls-card bg-[var(--ls-card-reminders)] p-4">
+          <p class="text-xs font-extrabold uppercase tracking-wide text-ls-text-muted">
+            This month
+          </p>
+          <p class="mt-2 text-3xl font-extrabold text-ls-text">
+            {{ stats.monthlyConsistencyPercentage }}%
+          </p>
+          <p class="mt-1 text-xs font-medium text-ls-text-muted">
+            {{ stats.completionsThisMonth }} completed days
+          </p>
+        </article>
+      </section>
+    }
+
+    <section class="ls-card bg-ls-surface p-4 sm:p-5">
+      <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <label class="xl:col-span-1">
+          <span class="sr-only">Search habits</span>
+          <input
+            type="search"
+            name="habitSearch"
+            [ngModel]="searchText()"
+            (ngModelChange)="searchText.set($event)"
+            placeholder="Search habits…"
+            class="h-11 w-full rounded-xl border border-ls-border bg-ls-input px-3 text-sm text-ls-text focus:border-navy"
+          />
+        </label>
+        <label>
+          <span class="sr-only">Filter habits by frequency</span>
+          <select
+            name="habitFrequency"
+            [ngModel]="frequencyFilter()"
+            (ngModelChange)="frequencyFilter.set($event)"
+            class="h-11 w-full rounded-xl border border-ls-border bg-ls-input px-3 text-sm text-ls-text"
+          >
+            <option value="">All frequencies</option>
+            <option value="DAILY">Daily</option>
+            <option value="WEEKLY">Weekly</option>
+            <option value="MONTHLY">Monthly</option>
+          </select>
+        </label>
+        <label>
+          <span class="sr-only">Filter habits by status</span>
+          <select
+            name="habitStatus"
+            [ngModel]="activeFilter()"
+            (ngModelChange)="activeFilter.set($event)"
+            class="h-11 w-full rounded-xl border border-ls-border bg-ls-input px-3 text-sm text-ls-text"
+          >
+            <option value="ALL">All habits</option>
+            <option value="ACTIVE">Active</option>
+            <option value="INACTIVE">Inactive</option>
+          </select>
+        </label>
+        <label>
+          <span class="sr-only">Sort habits</span>
+          <select
+            name="habitSort"
+            [ngModel]="sortBy()"
+            (ngModelChange)="sortBy.set($event)"
+            class="h-11 w-full rounded-xl border border-ls-border bg-ls-input px-3 text-sm text-ls-text"
+          >
+            <option value="NAME">Name</option>
+            <option value="STREAK">Current streak</option>
+          </select>
+        </label>
+      </div>
+    </section>
+
+    <section class="ls-card bg-[var(--ls-card-habits)] p-4 sm:p-6">
+      <div class="mb-4 flex items-center justify-between gap-3">
+        <div>
+          <h2 class="ls-section-title">Your routine</h2>
+          <p class="mt-1 text-xs font-medium text-ls-text-muted">
+            Streaks and today’s logs come directly from the backend.
+          </p>
+        </div>
+        @if (loading()) {
+          <span class="text-xs font-semibold text-ls-text-muted" role="status">Refreshing…</span>
+        }
+      </div>
+
+      @if (visibleHabits().length === 0) {
+        <div class="rounded-2xl bg-ls-surface/75 px-4 py-12 text-center">
+          <p class="text-lg font-extrabold text-ls-text">
+            {{ habitDetails().length === 0 ? 'No habits yet' : 'No habits match these filters' }}
+          </p>
+          <p class="mt-1 text-sm font-medium text-ls-text-muted">
+            {{
+              habitDetails().length === 0
+                ? 'Create a habit to start tracking your consistency.'
+                : 'Try a different search or filter.'
+            }}
+          </p>
+        </div>
+      } @else {
+        <div class="grid gap-4 lg:grid-cols-2">
+          @for (item of visibleHabits(); track item.habit.id) {
+            <article
+              class="rounded-3xl border border-ls-border bg-ls-surface p-4 shadow-soft sm:p-5"
+            >
+              <div class="flex items-start gap-3">
+                <span
+                  class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-aqua/50 text-xl text-ls-text"
+                  aria-hidden="true"
+                  >↻</span
+                >
+                <div class="min-w-0 flex-1">
+                  <div class="flex flex-wrap items-center gap-2">
+                    <h3 class="break-words text-lg font-extrabold text-ls-text">
+                      {{ item.habit.name }}
+                    </h3>
+                    <span
+                      class="rounded-full bg-soft-pink px-2.5 py-1 text-[11px] font-bold text-ls-text"
+                      >{{ frequencyLabel(item.habit.frequency) }}</span
+                    >
+                    <span
+                      class="rounded-full px-2.5 py-1 text-[11px] font-bold"
+                      [class]="item.habit.active ? 'bg-mint/35 text-ls-text' : 'bg-ls-surface-2 text-ls-text'"
+                    >
+                      {{ item.habit.active ? 'Active' : 'Inactive' }}
+                    </span>
+                  </div>
+                  <p class="mt-1 whitespace-pre-line text-sm text-ls-text-muted">
+                    {{ item.habit.description || 'No description' }}
+                  </p>
+                </div>
+              </div>
+
+              <div class="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                <div class="rounded-2xl bg-[var(--ls-card-goals)] px-3 py-3">
+                  <p class="text-[10px] font-extrabold uppercase tracking-wide text-ls-text-muted">
+                    Current streak
+                  </p>
+                  <p class="mt-1 text-xl font-extrabold text-ls-text">
+                    {{ item.streak.currentStreak }}
+                    <span class="text-xs font-semibold">{{ item.streak.periodUnit }}</span>
+                  </p>
+                </div>
+                <div class="rounded-2xl bg-ls-bg px-3 py-3">
+                  <p class="text-[10px] font-extrabold uppercase tracking-wide text-ls-text-muted">
+                    Longest
+                  </p>
+                  <p class="mt-1 text-xl font-extrabold text-ls-text">
+                    {{ item.streak.longestStreak }}
+                    <span class="text-xs font-semibold">{{ item.streak.periodUnit }}</span>
+                  </p>
+                </div>
+                <div class="rounded-2xl bg-soft-pink/60 px-3 py-3">
+                  <p class="text-[10px] font-extrabold uppercase tracking-wide text-ls-text-muted">
+                    Consistency
+                  </p>
+                  <p class="mt-1 text-xl font-extrabold text-ls-text">
+                    {{ item.streak.completionPercentage }}%
+                  </p>
+                </div>
+                <div class="rounded-2xl bg-mint/30 px-3 py-3">
+                  <p class="text-[10px] font-extrabold uppercase tracking-wide text-ls-text-muted">
+                    Completed days
+                  </p>
+                  <p class="mt-1 text-xl font-extrabold text-ls-text">
+                    {{ item.streak.totalCompletedDays }}
+                  </p>
+                </div>
+              </div>
+
+              <div
+                class="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-ls-bg px-3 py-3"
+              >
+                <div
+                  class="flex flex-wrap gap-x-4 gap-y-1 text-xs font-semibold text-ls-text-muted"
+                >
+                  @if (item.habit.frequency === 'WEEKLY') {
+                    <span
+                      >Target {{ item.habit.targetDaysPerWeek }} day{{
+                        item.habit.targetDaysPerWeek === 1 ? '' : 's'
+                      }}/week</span
+                    >
+                  } @else if (item.habit.frequency === 'MONTHLY') {
+                    <span>Target 1 completion per calendar month</span>
+                  } @else {
+                    <span>Eligible every day</span>
+                  }
+                  <span>Starts {{ formatDate(item.habit.startDate) }}</span>
+                  @if (item.habit.endDate) {
+                    <span>Ends {{ formatDate(item.habit.endDate) }}</span>
+                  }
+                </div>
+                @if (item.habit.active && todayLog(item.habit.id)?.completed) {
+                  <button
+                    type="button"
+                    class="rounded-xl bg-plum px-4 py-2.5 text-xs font-extrabold text-white transition hover:bg-orchid disabled:cursor-wait disabled:opacity-60"
+                    [disabled]="completingId() !== null"
+                    (click)="completeToday(item.habit)"
+                  >
+                    {{ completingId() === item.habit.id ? 'Saving…' : '✓ Completed · Undo' }}
+                  </button>
+                } @else if (canCompleteDate(item.habit, today())) {
+                  <button
+                    type="button"
+                    class="rounded-xl bg-plum px-4 py-2.5 text-xs font-extrabold text-cream disabled:cursor-wait disabled:opacity-60"
+                    [disabled]="completingId() !== null"
+                    (click)="completeToday(item.habit)"
+                  >
+                    {{ completingId() === item.habit.id ? 'Saving…' : 'Mark as Completed' }}
+                  </button>
+                } @else {
+                  <span class="text-xs font-semibold text-ls-text-muted">{{
+                    todayAvailabilityMessage(item.habit)
+                  }}</span>
+                }
+              </div>
+
+              <details class="mt-4 rounded-2xl border border-ls-border bg-ls-surface">
+                <summary class="cursor-pointer px-3 py-3 text-xs font-extrabold text-ls-text">
+                  Recent history ({{ item.logs.length }} log{{ item.logs.length === 1 ? '' : 's' }})
+                </summary>
+                <p class="border-t border-ls-border px-3 pt-3 text-xs text-ls-text-muted">
+                  Each log is a saved completion record for this habit on a specific date.
+                </p>
+                @if (item.logs.length === 0) {
+                  <p class="px-3 py-3 text-xs text-ls-text-muted">
+                    No saved completion records yet. Mark an eligible date as completed to create
+                    your first record.
+                  </p>
+                } @else {
+                  <ul class="max-h-44 space-y-2 overflow-y-auto px-3 py-3">
+                    @for (log of item.logs.slice(0, 10); track log.id) {
+                      <li class="flex items-center justify-between gap-3 text-xs">
+                        <span class="font-semibold text-ls-text">{{
+                          formatDate(log.completionDate)
+                        }}</span>
+                        <span
+                          class="rounded-full px-2 py-1 font-bold"
+                          [class]="log.completed ? 'bg-mint/35 text-ls-text' : 'bg-ls-surface-2 text-ls-text'"
+                          >{{ log.completed ? 'Completed' : 'Not completed' }}</span
+                        >
+                        @if (log.notes) {
+                          <span
+                            class="min-w-0 flex-1 truncate text-right text-ls-text-muted"
+                            [attr.title]="log.notes"
+                            >{{ log.notes }}</span
+                          >
+                        }
+                      </li>
+                    }
+                  </ul>
+                }
+              </details>
+
+              <div class="mt-3 flex justify-end gap-2">
+                <button
+                  type="button"
+                  class="rounded-lg border border-ls-border px-3 py-2 text-xs font-bold text-ls-text"
+                  (click)="beginEdit(item.habit)"
+                >
+                  Edit
+                </button>
+                @if (item.habit.active) {
+                  <button
+                    type="button"
+                    class="rounded-lg border border-purple/30 px-3 py-2 text-xs font-bold text-purple disabled:opacity-50"
+                    [disabled]="deactivatingId() === item.habit.id"
+                    (click)="deactivateHabit(item.habit)"
+                  >
+                    {{ deactivatingId() === item.habit.id ? 'Deactivating…' : 'Deactivate' }}
+                  </button>
+                }
+                <button
+                  type="button"
+                  class="rounded-lg border border-ls-border px-3 py-2 text-xs font-bold text-burgundy disabled:opacity-50"
+                  [disabled]="deletingId() === item.habit.id"
+                  (click)="deleteHabit(item.habit)"
+                >
+                  {{ deletingId() === item.habit.id ? 'Deleting…' : 'Delete' }}
+                </button>
+              </div>
+            </article>
+          }
+        </div>
+      }
+    </section>
+
+    <section class="ls-card bg-[var(--ls-card-goals)] p-4 sm:p-6">
+      <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p class="text-xs font-extrabold uppercase tracking-[0.14em] text-purple">
+            Your consistency
+          </p>
+          <h2 class="mt-1 text-2xl font-extrabold text-plum dark:text-cream">Habit calendar</h2>
+          <p class="mt-1 text-xs font-medium text-ls-text-muted">
+            Select a date to view and update this habit’s completion.
+          </p>
+        </div>
+        <label class="w-full sm:max-w-xs">
+          <span class="sr-only">Select a habit calendar</span>
+          <select
+            name="calendarHabit"
+            [ngModel]="selectedCalendarHabitId()"
+            (ngModelChange)="setCalendarHabit($event)"
+            class="h-11 w-full rounded-xl border border-ls-border bg-ls-input px-3 text-sm font-semibold text-ls-text"
+          >
+            @for (item of habitDetails(); track item.habit.id) {
+              <option [ngValue]="item.habit.id">{{ item.habit.name }}</option>
+            }
+          </select>
+        </label>
+      </div>
+
+      @if (habitDetails().length === 0) {
+        <p
+          class="mt-4 rounded-2xl bg-ls-surface/70 px-4 py-8 text-center text-sm text-ls-text-muted"
+        >
+          Create a habit to view its calendar.
+        </p>
+      } @else {
+        <div class="mt-5 rounded-2xl bg-ls-surface p-4 sm:p-5">
+          <div class="mb-4 flex items-center justify-between gap-3">
+            <button
+              type="button"
+              class="flex h-10 w-10 items-center justify-center rounded-xl border border-ls-border text-lg font-bold text-ls-text hover:bg-ls-bg disabled:opacity-50"
+              aria-label="Previous month"
+              [disabled]="calendarLoading()"
+              (click)="changeMonth(-1)"
+            >
+              ‹
+            </button>
+            <div class="text-center">
+              <h3 class="text-lg font-extrabold text-ls-text">{{ monthLabel() }}</h3>
+              @if (calendar(); as month) {
+                <p class="text-xs font-medium text-ls-text-muted">
+                  {{ month.completedDays }} completion{{ month.completedDays === 1 ? '' : 's' }} ·
+                  {{ month.eligibleDays }} target slot{{ month.eligibleDays === 1 ? '' : 's' }} ·
+                  {{ month.completionPercentage }}%
+                </p>
+              }
+            </div>
+            <button
+              type="button"
+              class="flex h-10 w-10 items-center justify-center rounded-xl border border-ls-border text-lg font-bold text-ls-text hover:bg-ls-bg disabled:opacity-50"
+              aria-label="Next month"
+              [disabled]="calendarLoading()"
+              (click)="changeMonth(1)"
+            >
+              ›
+            </button>
+          </div>
+
+          @if (calendarError(); as message) {
+            <div
+              class="flex flex-col items-start justify-between gap-3 rounded-xl bg-ls-surface-2 px-3 py-3 text-sm font-semibold text-ls-text sm:flex-row sm:items-center"
+              role="alert"
+            >
+              <span>{{ message }}</span>
+              <button
+                type="button"
+                class="rounded-lg bg-plum px-3 py-2 text-xs font-bold text-cream"
+                (click)="loadCalendar()"
+              >
+                Retry calendar
+              </button>
+            </div>
+          } @else if (calendarLoading() && !calendar()) {
+            <p class="py-8 text-center text-sm font-medium text-ls-text-muted" role="status">
+              Loading calendar…
+            </p>
+          } @else if (calendar(); as month) {
+            <div class="grid grid-cols-7 gap-1.5 sm:gap-2">
+              @for (weekday of ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']; track weekday) {
+                <span
+                  class="py-1 text-center text-[10px] font-extrabold uppercase text-ls-text-muted sm:text-xs"
+                  >{{ weekday }}</span
+                >
+              }
+              @for (day of calendarGrid(); track $index) {
+                @if (day; as item) {
+                  <button
+                    type="button"
+                    class="relative flex aspect-square min-h-9 flex-col items-center justify-center rounded-xl text-xs font-extrabold transition hover:ring-2 hover:ring-purple/50 sm:min-h-11 sm:text-sm"
+                    [class]="dayClass(item)"
+                    [class.ring-2]="selectedCalendarDate() === item.date"
+                    [class.ring-purple]="selectedCalendarDate() === item.date"
+                    [attr.aria-label]="formatDate(item.date) + ', ' + calendarDayStatus(item)"
+                    [attr.aria-pressed]="selectedCalendarDate() === item.date"
+                    (click)="selectedCalendarDate.set(item.date)"
+                  >
+                    {{ +item.date.slice(-2) }}
+                    @if (item.completed) {
+                      <span
+                        class="absolute bottom-1 h-1 w-1 rounded-full bg-plum sm:bottom-1.5"
+                        aria-hidden="true"
+                      ></span>
+                    }
+                  </button>
+                } @else {
+                  <span class="aspect-square min-h-9 sm:min-h-11" aria-hidden="true"></span>
+                }
+              }
+            </div>
+
+            <div
+              class="mt-4 flex flex-wrap gap-3 text-[11px] font-semibold text-ls-text-muted"
+              aria-label="Calendar legend"
+            >
+              <span class="flex items-center gap-1.5"
+                ><i class="h-3 w-3 rounded-full bg-aqua ring-1 ring-mint"></i>Completed</span
+              >
+              <span class="flex items-center gap-1.5"
+                ><i class="h-3 w-3 rounded-full bg-ls-surface-2/70"></i>Eligible, not completed</span
+              >
+              <span class="flex items-center gap-1.5"
+                ><i class="h-3 w-3 rounded-full bg-ls-bg"></i>Outside habit dates</span
+              >
+              <span class="flex items-center gap-1.5"
+                ><i class="h-3 w-3 rounded-full bg-purple/20"></i>Future date</span
+              >
+              <span class="flex items-center gap-1.5"
+                ><i class="h-3 w-3 rounded-full bg-ls-bg ring-1 ring-purple/30"></i>Not eligible
+                (target met)</span
+              >
+            </div>
+
+            @if (selectedDay(); as day) {
+              <div class="mt-4 rounded-xl bg-ls-bg px-3 py-3 text-sm">
+                <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                  <p class="font-extrabold text-ls-text">
+                    {{ formatDate(day.date) }} · {{ calendarDayStatus(day) }}
+                  </p>
+                  @if (
+                    selectedCalendarHabit()?.active &&
+                    (day.completed || (day.eligible && day.date <= today()))
+                  ) {
+                    <button
+                      type="button"
+                      class="rounded-lg px-3 py-2 text-xs font-bold disabled:opacity-60"
+                      [class.bg-plum]="!day.completed"
+                      [class.text-cream]="!day.completed"
+                      [class.bg-lime]="day.completed"
+                      [class.text-ls-text]="day.completed"
+                      [disabled]="completingId() !== null"
+                      (click)="completeSelectedDay()"
+                    >
+                      @if (completingId() === selectedCalendarHabit()?.id) {
+                        Saving…
+                      } @else if (day.completed) {
+                        ✓ Completed · Undo Completion
+                      } @else {
+                        Mark as Completed
+                      }
+                    </button>
+                  }
+                </div>
+                @if (day.notes) {
+                  <p class="mt-1 whitespace-pre-line text-xs text-ls-text-muted">{{ day.notes }}</p>
+                }
+              </div>
+            } @else {
+              <p class="mt-4 text-center text-xs text-ls-text-muted">
+                Select a date to view its completion details.
+              </p>
+            }
+          }
+        </div>
+      }
+    </section>
+  }
+
+  @if (habitFormOpen()) {
+    <app-habit-form
+      [habit]="selectedHabit()"
+      [saving]="saving()"
+      [requestError]="formError()"
+      (save)="saveHabit($event)"
+      (cancel)="habitFormOpen.set(false)"
+    />
+  }
+</div>

@@ -1,0 +1,280 @@
+<div class="mx-auto flex max-w-7xl flex-col gap-5">
+  <section class="ls-card ls-title-card flex flex-col gap-4 bg-ls-surface p-5 sm:flex-row sm:items-center sm:justify-between sm:p-7">
+    <div>
+      <p class="ls-title-eyebrow text-sm font-bold uppercase tracking-[0.14em]">Stay on top of it</p>
+      <h1 class="mt-1 text-3xl font-extrabold tracking-tight text-plum dark:text-cream sm:text-4xl">Your Tasks</h1>
+      <p class="mt-2 text-sm font-medium text-ls-text/70">
+        {{ totalElements() }} task{{ totalElements() === 1 ? '' : 's' }} in your workspace
+      </p>
+    </div>
+    <button
+      type="button"
+      class="rounded-2xl bg-lime px-5 py-3 text-sm font-extrabold text-plum shadow-soft transition hover:bg-mint"
+      (click)="beginCreate()"
+    >
+      + Create task
+    </button>
+  </section>
+
+  @if (success(); as message) {
+    <div class="flex items-center justify-between gap-3 rounded-2xl bg-mint/35 px-4 py-3 text-sm font-semibold text-ls-text" role="status">
+      <span>{{ message }}</span>
+      <button type="button" class="rounded-lg px-2 py-1 font-bold" aria-label="Dismiss message" (click)="clearSuccess()">×</button>
+    </div>
+  }
+
+  @if (actionError(); as message) {
+    <p class="rounded-2xl bg-ls-surface-2 px-4 py-3 text-sm font-semibold text-ls-text" role="alert">{{ message }}</p>
+  }
+
+  <section class="ls-card bg-ls-surface p-4 sm:p-5">
+    <form class="grid gap-3 sm:grid-cols-2 xl:grid-cols-6" (ngSubmit)="applyFilters()">
+      <label class="relative sm:col-span-2">
+        <span class="sr-only">Search tasks</span>
+        <input
+          type="search"
+          name="taskSearch"
+          [ngModel]="searchText()"
+          (ngModelChange)="searchText.set($event)"
+          placeholder="Search task titles…"
+          class="h-11 w-full rounded-xl border border-ls-border bg-ls-input px-3 text-sm text-ls-text focus:border-navy"
+        />
+      </label>
+      <label>
+        <span class="sr-only">Filter by status</span>
+        <select
+          name="statusFilter"
+          [ngModel]="statusFilter()"
+          (ngModelChange)="updateStatusFilter($event)"
+          class="h-11 w-full rounded-xl border border-ls-border bg-ls-input px-3 text-sm text-ls-text"
+        >
+          <option value="">All statuses</option>
+          <option value="TODO">Pending</option>
+          <option value="IN_PROGRESS">In progress</option>
+          <option value="COMPLETED">Completed</option>
+          <option value="OVERDUE">Overdue</option>
+          <option value="MISSED">Missed</option>
+          <option value="CANCELLED">Cancelled</option>
+        </select>
+      </label>
+      <label>
+        <span class="sr-only">Filter by priority</span>
+        <select
+          name="priorityFilter"
+          [ngModel]="priorityFilter()"
+          (ngModelChange)="updatePriorityFilter($event)"
+          class="h-11 w-full rounded-xl border border-ls-border bg-ls-input px-3 text-sm text-ls-text"
+        >
+          <option value="">All priorities</option>
+          <option value="LOW">Low</option>
+          <option value="MEDIUM">Medium</option>
+          <option value="HIGH">High</option>
+          <option value="URGENT">Urgent</option>
+        </select>
+      </label>
+      <label>
+        <span class="sr-only">Filter by category</span>
+        <select
+          name="categoryFilter"
+          [ngModel]="categoryFilter()"
+          (ngModelChange)="updateCategoryFilter($event)"
+          class="h-11 w-full rounded-xl border border-ls-border bg-ls-input px-3 text-sm text-ls-text"
+        >
+          <option [ngValue]="''">All categories</option>
+          @for (category of categories(); track category.id) {
+            <option [ngValue]="category.id">{{ category.name }}</option>
+          }
+        </select>
+      </label>
+      <label>
+        <span class="sr-only">Sort tasks</span>
+        <select
+          name="taskSort"
+          [ngModel]="sortBy()"
+          (ngModelChange)="updateSortBy($event)"
+          class="h-11 w-full rounded-xl border border-ls-border bg-ls-input px-3 text-sm text-ls-text"
+        >
+          <option value="createdAt">Newest</option>
+          <option value="updatedAt">Recently updated</option>
+          <option value="dueDate">Due date</option>
+          <option value="title">Title</option>
+          <option value="priority">Priority</option>
+          <option value="status">Status</option>
+          <option value="startDate">Start date</option>
+        </select>
+      </label>
+      <div class="flex gap-2 sm:col-span-2 xl:col-span-6">
+        <button type="submit" class="rounded-xl bg-lime px-4 py-2.5 text-sm font-extrabold text-plum transition hover:bg-mint">
+          Search
+        </button>
+        <button
+          type="button"
+          class="rounded-xl border border-ls-border px-4 py-2.5 text-sm font-bold text-ls-text"
+          (click)="direction.set(direction() === 'ASC' ? 'DESC' : 'ASC'); applyFilters()"
+        >
+          {{ direction() === 'ASC' ? 'Ascending ↑' : 'Descending ↓' }}
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <section class="ls-card bg-[var(--ls-card-tasks)] p-4 sm:p-5">
+    <div class="mb-4 flex items-center justify-between gap-3">
+      <div>
+        <h2 class="ls-section-title">All Tasks</h2>
+        <p class="mt-1 text-xs font-medium text-ls-text-muted">Your tasks and categories, kept in sync.</p>
+      </div>
+      @if (loading()) {
+        <span class="text-xs font-semibold text-ls-text-muted" role="status">Loading…</span>
+      }
+    </div>
+
+    @if (error(); as message) {
+      <div class="flex flex-col items-start justify-between gap-3 rounded-2xl bg-ls-surface-2 px-4 py-4 text-sm font-semibold text-ls-text sm:flex-row sm:items-center" role="alert">
+        <span>{{ message }}</span>
+        <button type="button" class="rounded-xl bg-plum px-4 py-2 font-bold text-cream" (click)="loadTasks()">Retry</button>
+      </div>
+    } @else if (loading() && tasks().length === 0) {
+      <div class="py-12 text-center text-sm font-semibold text-ls-text-muted" role="status">Loading your tasks…</div>
+    } @else if (tasks().length === 0) {
+      <div class="rounded-2xl bg-ls-bg px-4 py-12 text-center">
+        <p class="text-lg font-extrabold text-ls-text">No tasks found</p>
+        <p class="mt-1 text-sm font-medium text-ls-text-muted">Create a task or adjust your filters.</p>
+      </div>
+    } @else {
+      <ul class="space-y-3">
+        @for (task of tasks(); track task.id) {
+          <li class="rounded-2xl border border-ls-border bg-ls-surface px-4 py-4 shadow-soft sm:px-5">
+            <div class="flex flex-col gap-4 lg:flex-row lg:items-start">
+              <button
+                type="button"
+                class="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center self-start rounded-lg border-2 border-navy/30 text-plum transition hover:border-navy disabled:opacity-50"
+                [class.bg-lime]="task.status === 'COMPLETED'"
+                [class.bg-ls-bg]="task.status !== 'COMPLETED'"
+                [attr.aria-label]="task.status === 'COMPLETED' ? 'Reopen task' : 'Mark completed'"
+                [attr.aria-pressed]="task.status === 'COMPLETED'"
+                [disabled]="task.status === 'CANCELLED' || task.status === 'MISSED' || updatingTaskId() === task.id"
+                (click)="toggleCompletion(task)"
+              >
+                @if (task.status === 'COMPLETED') { ✓ }
+              </button>
+              <div class="min-w-0 flex-1">
+                <div class="flex flex-wrap items-center gap-2">
+                  <h3 class="text-base font-extrabold text-ls-text" [class.line-through]="task.status === 'COMPLETED'">
+                    {{ task.title }}
+                  </h3>
+                  <span class="rounded-full px-2.5 py-1 text-[11px] font-bold" [class]="priorityClass(task.priority)">
+                    {{ task.priority }}
+                  </span>
+                  <span class="rounded-full px-2.5 py-1 text-[11px] font-bold" [class]="statusClass(task.status)">
+                    {{ statusLabel(task.status) }}
+                  </span>
+                </div>
+                <p class="mt-1 whitespace-pre-line text-sm text-ls-text-muted">
+                  {{ task.description || 'No description' }}
+                </p>
+                <div class="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-xs font-semibold text-ls-text-muted">
+                  <span>Category: {{ task.categoryName || 'Uncategorized' }}</span>
+                  <span>Due: {{ formatDateTime(task.dueDate) }}</span>
+                  @if (task.startDate) { <span>Starts: {{ formatDateTime(task.startDate) }}</span> }
+                  @if (task.estimatedDuration) { <span>{{ task.estimatedDuration }} min</span> }
+                  @if (task.recurring) { <span>Repeats {{ task.recurrenceType.toLowerCase() }}</span> }
+                </div>
+              </div>
+              <div class="flex shrink-0 flex-wrap gap-2 lg:justify-end">
+                @if (task.status === 'TODO') {
+                  <button type="button" class="rounded-xl bg-powder-blue px-3 py-2 text-xs font-bold text-plum disabled:opacity-50" [disabled]="updatingTaskId() === task.id" (click)="startTask(task)">
+                    Start
+                  </button>
+                }
+                @if (task.status === 'TODO' || task.status === 'IN_PROGRESS' || task.status === 'OVERDUE') {
+                  <button type="button" class="rounded-xl bg-mint/40 px-3 py-2 text-xs font-bold text-ls-text disabled:opacity-50" [disabled]="updatingTaskId() === task.id" (click)="completeTask(task)">
+                    Complete
+                  </button>
+                }
+                @if (task.status === 'IN_PROGRESS' || task.status === 'OVERDUE') {
+                  <button type="button" class="rounded-xl border border-tangerine px-3 py-2 text-xs font-bold text-plum disabled:opacity-50" [disabled]="updatingTaskId() === task.id" (click)="markTaskMissed(task)">
+                    Mark as missed
+                  </button>
+                }
+                @if (task.status === 'TODO' || task.status === 'IN_PROGRESS' || task.status === 'OVERDUE') {
+                  <button type="button" class="rounded-xl border border-ls-border px-3 py-2 text-xs font-bold text-ls-text disabled:opacity-50" [disabled]="updatingTaskId() === task.id" (click)="cancelTask(task)">
+                    Cancel
+                  </button>
+                }
+                @if (task.status === 'OVERDUE') {
+                  <button type="button" class="rounded-xl border border-burgundy px-3 py-2 text-xs font-bold text-burgundy" (click)="beginEdit(task)">
+                    Reschedule
+                  </button>
+                }
+                @if (task.status === 'MISSED') {
+                  <button type="button" class="rounded-xl border border-burgundy px-3 py-2 text-xs font-bold text-burgundy" (click)="beginEdit(task)">
+                    Reschedule
+                  </button>
+                }
+                @if (task.status === 'COMPLETED') {
+                  <button type="button" class="rounded-xl border border-ls-border px-3 py-2 text-xs font-bold text-ls-text disabled:opacity-50" [disabled]="updatingTaskId() === task.id" (click)="restoreTask(task)">
+                    Reopen
+                  </button>
+                }
+                @if (task.status === 'MISSED' || task.status === 'CANCELLED') {
+                  <button type="button" class="rounded-xl border border-ls-border px-3 py-2 text-xs font-bold text-ls-text disabled:opacity-50" [disabled]="updatingTaskId() === task.id" (click)="restoreTask(task)">
+                    Restore
+                  </button>
+                }
+                @if (task.status === 'TODO' || task.status === 'IN_PROGRESS' || task.status === 'OVERDUE') {
+                  <button type="button" class="rounded-xl border border-ls-border px-3 py-2 text-xs font-bold text-ls-text hover:bg-ls-bg" (click)="beginEdit(task)">
+                    Edit
+                  </button>
+                }
+                <button
+                  type="button"
+                  class="rounded-xl border border-ls-border px-3 py-2 text-xs font-bold text-burgundy hover:bg-ls-surface-2/40 disabled:opacity-50"
+                  [disabled]="deletingTaskId() !== null"
+                  (click)="deleteTask(task)"
+                >
+                  {{ confirmingDeleteTaskId() === task.id ? 'Confirming…' : deletingTaskId() === task.id ? 'Deleting…' : 'Delete' }}
+                </button>
+              </div>
+            </div>
+          </li>
+        }
+      </ul>
+
+      @if (totalPages() > 1) {
+        <div class="mt-5 flex items-center justify-between gap-3 border-t border-ls-border pt-4">
+          <button type="button" class="rounded-xl border border-ls-border px-4 py-2 text-sm font-bold text-ls-text disabled:opacity-40" [disabled]="page() === 0 || loading()" (click)="changePage(page() - 1)">
+            Previous
+          </button>
+          <span class="text-xs font-semibold text-ls-text-muted">Page {{ page() + 1 }} of {{ totalPages() }}</span>
+          <button type="button" class="rounded-xl border border-ls-border px-4 py-2 text-sm font-bold text-ls-text disabled:opacity-40" [disabled]="page() + 1 >= totalPages() || loading()" (click)="changePage(page() + 1)">
+            Next
+          </button>
+        </div>
+      }
+    }
+  </section>
+
+  @if (categoriesError(); as message) {
+    <div class="flex flex-col gap-3 rounded-2xl bg-ls-surface-2 px-4 py-3 text-sm font-semibold text-ls-text sm:flex-row sm:items-center sm:justify-between" role="alert">
+      <span>{{ message }}</span>
+      <button type="button" class="rounded-xl bg-plum px-4 py-2 font-bold text-cream" (click)="loadCategories()">Retry categories</button>
+    </div>
+  }
+  <app-category-manager
+    [categories]="categories()"
+    [loading]="categoriesLoading()"
+    (categoriesChanged)="categoriesChanged()"
+  />
+
+  @if (formOpen()) {
+    <app-task-form
+      [task]="selectedTask()"
+      [categories]="categories()"
+      [saving]="saving()"
+      [requestError]="formError()"
+      (save)="saveTask($event)"
+      (cancel)="cancelForm()"
+    />
+  }
+</div>
