@@ -4,6 +4,16 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+# Nested application dependencies, generated output, and local secrets
+**/node_modules/
+**/.env
+**/.env.*
+!.env.example
+**/dist/
+**/build/
+**/.angular/
+**/coverage/
+
 ### STS ###
 .apt_generated
 .classpath

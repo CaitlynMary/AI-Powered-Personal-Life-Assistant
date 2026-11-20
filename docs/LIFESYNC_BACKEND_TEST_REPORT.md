@@ -1,5 +1,7 @@
 # LifeSync Backend Audit and Test Report
 
+> Static audit and test-evidence snapshot; this document is not regenerated automatically when tests run.
+
 Audit date: 2026-11-10  
 Project root package: `com.lifesync.lifesync`  
 Runtime under test: Java 21, Spring Boot 4.1.2
