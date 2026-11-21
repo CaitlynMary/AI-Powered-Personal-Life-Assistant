@@ -1,2 +1,4 @@
-/** Spring Boot origin. CORS already allows the Angular dev server. */
-export const API_BASE_URL = 'http://localhost:8080';
+import { environment } from '../../environments/environment';
+
+/** Spring Boot origin. */
+export const API_BASE_URL = environment.apiUrl;
